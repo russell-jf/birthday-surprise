@@ -7,6 +7,9 @@
     <meta name="title" content="宝宝的生日惊喜">
     <meta name="github" content="https://github.com/sun0225SUN/Awesome-Love-Code">
     <meta name="describe" content="Based on Awesome-Love-Code Web/003 (MIT License)">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai&display=swap" rel="stylesheet" />
     <link type="text/css" rel="stylesheet" href="./Love_files/default.css">
     <script type="text/javascript" src="./Love_files/jquery.min.js"></script>
     <script type="text/javascript" src="./Love_files/jscex.min.js"></script>
@@ -25,32 +28,33 @@
         <div id="wrap">
             <div id="text">
                 <div id="code">
-                    <span class="say">一定要爱你，宝宝</span><br><br>
-                    <span class="say">我知道你是一个天真善良温柔的女孩</span><br>
-                    <span class="say">真的希望自己能够配上你</span><br>
-                    <span class="say">如果你能给我机会让我好好的爱你</span><br>
-                    <span class="say">真的只想真心真意对你说</span><br>
+                    <span class="say">祝最亲爱的你，生日快乐！</span><br><br>
+                    <span class="say">在这个特别又美好的日子里</span><br>
+                    <span class="say">想把世间所有的温柔都送给你</span><br>
+                    <span class="say">感谢你的出现，点亮了我所有的时光</span><br>
+                    <span class="say">真心真意想对你说一声</span><br>
                     <br>
-                    <span class="say">我爱你一定爱到花都开了 鸟儿把歌唱</span><br>
-                    <span class="say">爱到牛郎织女为我们点头</span><br>
-                    <span class="say">爱到花儿绽放鸟儿成群 把我们环绕</span><br>
-                    <span class="say">爱到每道彩虹映出你的美</span><br>
+                    <span class="say">愿你新的一岁阳光万里，鲜花沿路开放</span><br>
+                    <span class="say">愿所有的美好与幸运都与你相拥</span><br>
+                    <span class="say">愿你眼里总有光芒，笑里全是坦荡</span><br>
+                    <span class="say">愿你被时光温柔以待，永远无忧无虑</span><br>
                     <br>
-                    <span class="say">我爱你一定爱到海枯石烂 永远不后悔</span><br>
-                    <span class="say">爱到来生来世也会说无悔</span><br>
-                    <span class="say">就把这首动听的歌唱给心爱的女孩</span><br>
-                    <span class="say">真的希望你能给我个机会</span><br>
-                    <span class="say">让我去爱你</span><br>
+                    <span class="say">每一年的这一天，我都想陪你一起度过</span><br>
+                    <span class="say">无论岁月如何变幻，初心始终不变</span><br>
+                    <span class="say">就把这份最深情的祝福写给心爱的女孩</span><br>
+                    <span class="say">愿你平安喜乐，顺遂无忧</span><br>
+                    <span class="say">生日快乐，我的宝</span><br>
                     <br>
-                    <span class="say"><span class="space"></span> -- 永远偏爱你的人</span>
+                    <span class="say"><span class="space"></span> -- 永远爱你的我</span>
                 </div>
             </div>
             <div id="clock-box">
-                <a href="javascript:void(0)">星星</a> 和 <a href="javascript:void(0)">月亮</a> 在一起的
+                <a href="javascript:void(0)">SJF</a> 和 <a href="javascript:void(0)">LYM</a> 在一起的
                 <div id="clock"></div>
             </div>
             <canvas id="canvas" width="1100" height="680"></canvas>
         </div>
+        <div id="happy-birthday" aria-hidden="true">Happy Birthday</div>
     </div>
     <div id="hint">点击粉色小种子，看爱心树长大 ♡</div>
 
@@ -202,6 +206,8 @@
 
                 $("#code").show().typewriter();
                 $("#clock-box").fadeIn(500);
+                $await(Jscex.Async.sleep(2800));
+                $("#happy-birthday").addClass('show');
                 while (true) {
                     timeElapse(together);
                     $await(Jscex.Async.sleep(1000));

@@ -1,6 +1,6 @@
 /* Based on Awesome-Love-Code Web/003 (MIT) — adapted for fullscreen embed */
 
-/* 全站统一字体：霞鹜文楷（LXGW WenKai，OFL-1.1），已按本站用字裁剪为 60KB 子集 */
+/* 霞鹜文楷：本地子集兜底 + Google Fonts 全字库 */
 @font-face {
 	font-family: 'LoveKai';
 	src: url('./lxgwwenkai-subset.woff2') format('woff2');
@@ -10,7 +10,7 @@
 }
 
 :root {
-	--font-main: 'LoveKai', 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Songti SC', serif;
+	--font-main: 'LXGW WenKai', 'LoveKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Songti SC', serif;
 	--ink: #4a1220;
 	--ink-strong: #b3122b;
 }
@@ -140,4 +140,52 @@ a {
 	letter-spacing: 0.06em;
 	color: #9d174d;
 	pointer-events: none;
+}
+
+/* 动画结束后居中浮现；字号按 1100×680 画布坐标系，经 wrap scale 缩放 */
+#happy-birthday {
+	position: absolute;
+	left: 50%;
+	top: 20%;
+	z-index: 6;
+	margin: 0;
+	padding: 0 0.15em;
+	font-family: var(--font-main);
+	font-size: 68px;
+	font-weight: 400;
+	line-height: 1.1;
+	letter-spacing: 0.06em;
+	white-space: nowrap;
+	color: #be1a25;
+	text-shadow:
+		0 2px 0 rgba(255, 255, 255, 0.75),
+		0 8px 28px rgba(190, 26, 37, 0.35),
+		0 0 40px rgba(255, 192, 203, 0.85);
+	opacity: 0;
+	transform: translate(-50%, -42%) scale(0.86);
+	pointer-events: none;
+	transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#happy-birthday.show {
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+	animation: hbFloat 3.2s ease-in-out 1.2s infinite;
+}
+
+@keyframes hbFloat {
+	0%,
+	100% {
+		transform: translate(-50%, -50%) scale(1);
+	}
+	50% {
+		transform: translate(-50%, calc(-50% - 10px)) scale(1.03);
+	}
+}
+
+@media (max-width: 720px) {
+	#happy-birthday {
+		font-size: 40px;
+		letter-spacing: 0.04em;
+	}
 }

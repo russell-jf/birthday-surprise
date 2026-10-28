@@ -1,28 +1,19 @@
-# 宝宝的生日惊喜
+# 生日惊喜
 
-梦幻粉色生日网页。昵称：**宝宝**。
+梦幻粉色生日网页
 
 ## 流程
 
 1. 星空开场  
-2. 3D 爱心  
+2. 爱心  
 3. 回忆照片墙（表格 / 球球 / 螺旋 / 格子）  
 4. 蛋糕 / 吹蜡烛  
 5. 倒数烟花  
-6. **一封情书**（最终幕）：嵌入 [Awesome-Love-Code Web/003](https://sun0225sun.github.io/Awesome-Love-Code/Web/003/) 原版爱心树动画
+6. **一封情书**（最终幕）爱心树动画
 
-整体视觉统一为 Web/003 的经典粉红（`#ffc0cb`）+ 微软雅黑/宋体气质。
+整体视觉统一为 Web/003 的经典粉红（`#ffc0cb`）+ 霞鹜文楷（LXGW WenKai）。
+爱心场景嵌入。
 
-## 第三方致谢
-
-最终幕源码来自：
-
-- 仓库：https://github.com/sun0225SUN/Awesome-Love-Code  
-- 路径：`Web/003`  
-- 许可证：**MIT**（Copyright (c) 2022 小孙同学）  
-- 本地副本：`public/love003/`（含 `NOTICE.txt`）
-
-照片墙交互参考同仓库 `Web/007` 的 CSS3D 布局思路，为原创实现。
 
 ## 技术栈
 
@@ -51,4 +42,5 @@ https://russell-jf.github.io/birthday-surprise/
 - 文案 / 昵称：`src/data/content.js`
 - 情书正文：`public/love003/index.html` 内 `#code`
 - 相处计时起点：同文件中 `together.setFullYear(...)`
-- 照片：`public/placeholders/`
+- 照片：`public/image/`
+- 爱心：`public/love002/`

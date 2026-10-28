@@ -62,21 +62,31 @@
 .stars-copy .type-line {
   min-height: 1.8em;
   font-size: clamp(1.05rem, 3vw, 1.35rem);
-  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-main);
   color: #4a1028;
 }
 
-.heart-scene,
+.heart-scene {
+  background: #ffc0cb;
+}
+
 .cake-scene {
   background: linear-gradient(180deg, #ffe4ec 0%, #ffc0cb 55%, #ffb0c4 100%);
 }
 
-.heart-scene .scene-copy h2,
-.heart-scene .scene-copy p,
 .cake-scene .scene-copy h2,
 .cake-scene .scene-copy p {
   color: #9d174d;
   text-shadow: none;
+}
+
+.love002-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffc0cb;
 }
 
 .finale-copy h1,
@@ -171,7 +181,7 @@
   padding: 0.45rem 0.95rem;
   font-size: 0.88rem;
   letter-spacing: 0.06em;
-  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-main);
 }
 
 .wall-btn:hover,

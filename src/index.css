@@ -14,9 +14,10 @@
   --gold: #e8b86d;
   --gold-soft: #f6d9a8;
   --shadow: 0 18px 50px rgba(190, 24, 93, 0.18);
-  --font-display: 'Ma Shan Zheng', '微软雅黑', cursive;
-  --font-poem: 'Noto Serif SC', '宋体', serif;
-  --font-body: 'Noto Sans SC', '微软雅黑', '宋体', sans-serif;
+  --font-main: 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Songti SC', serif;
+  --font-display: var(--font-main);
+  --font-poem: var(--font-main);
+  --font-body: var(--font-main);
   --love-pink: #ffc0cb;
   --love-ink: #1a1a1a;
   color: var(--love-ink);
@@ -140,7 +141,7 @@ img {
   box-shadow: 0 12px 28px rgba(190, 26, 37, 0.28);
   font-weight: 600;
   letter-spacing: 0.04em;
-  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-main);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -188,7 +189,7 @@ img {
   color: #4a1028;
   font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   line-height: 1.65;
-  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-main);
 }
 
 .sparkle-field {

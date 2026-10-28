@@ -1,0 +1,4 @@
+Based on Awesome-Love-Code Web/002
+https://github.com/sun0225SUN/Awesome-Love-Code
+https://sun0225sun.github.io/Awesome-Love-Code/Web/002/
+MIT License

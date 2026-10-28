@@ -1,5 +1,7 @@
 export const NICKNAME = '宝宝'
 
+export const BIRTH_DATE = '2026 11 26'
+
 export const SCENES = [
   { id: 'stars', label: '星空' },
   { id: 'heart', label: '爱心' },
@@ -21,27 +23,27 @@ const asset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
 /** 基础回忆图，会在照片墙中循环铺满 */
 export const MEMORIES = [
   {
-    src: asset('placeholders/memory-1.svg'),
+    src: asset('image/1.jpg'),
     title: '第一次见面',
     caption: '那天阳光刚好，世界忽然变得柔软。',
   },
   {
-    src: asset('placeholders/memory-2.svg'),
+    src: asset('image/2.jpg'),
     title: '一起走过的路',
     caption: '手牵手也好，肩并肩也好，都是我最喜欢的风景。',
   },
   {
-    src: asset('placeholders/memory-3.svg'),
+    src: asset('image/3.jpg'),
     title: '偷笑的瞬间',
     caption: '你笑起来的时候，连空气都甜了一点。',
   },
   {
-    src: asset('placeholders/memory-4.svg'),
+    src: asset('image/4.jpg'),
     title: '小小的约定',
     caption: '我们说好，要把平凡日子过成童话。',
   },
   {
-    src: asset('placeholders/memory-5.svg'),
+    src: asset('image/5.jpg'),
     title: '今天也爱你',
     caption: '生日快乐，我的公主。',
   },

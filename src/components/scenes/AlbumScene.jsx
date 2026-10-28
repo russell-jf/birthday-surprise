@@ -192,7 +192,6 @@ export default function AlbumScene() {
     <section className="scene album-scene album-wall-scene">
       <div className="scene-copy wall-copy">
         <h2>回忆照片墙</h2>
-        <p>拖拽旋转 · 切换造型 · 点开看看 {NICKNAME} 的小瞬间</p>
       </div>
 
       <div ref={mountRef} className="wall-stage" />

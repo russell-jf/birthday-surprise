@@ -71,7 +71,6 @@ export default function StarryOpening({ onReady }) {
       <div className="star-field">{starNodes}</div>
       <Sparkles />
       <div className="scene-copy stars-copy">
-        <h1>Happy Birthday</h1>
         <p ref={lineRef} className="type-line">
           …
         </p>

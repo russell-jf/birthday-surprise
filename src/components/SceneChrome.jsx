@@ -1,10 +1,10 @@
-import { NICKNAME, SCENES } from '../data/content'
+import { NICKNAME, SCENES, BIRTH_DATE } from '../data/content'
 
 export default function SceneChrome({ sceneIndex, showCta, ctaLabel, onCta, ctaDisabled }) {
   return (
     <>
       <header className="hud">
-        <div className="brand">{NICKNAME}</div>
+        <div className="brand">{BIRTH_DATE}</div>
         <div className="progress" aria-label="进度">
           {SCENES.map((scene, i) => (
             <span
