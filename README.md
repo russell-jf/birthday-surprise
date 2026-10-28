@@ -42,7 +42,7 @@ npm run dev
 
 部署到 GitHub Pages 后访问：
 
-`https://<你的用户名>.github.io/birthday-surprise/`
+https://russell-jf.github.io/birthday-surprise/
 
 推送到 `main` 分支后，GitHub Actions 会自动构建并发布。
 
