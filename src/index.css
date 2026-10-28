@@ -1,0 +1,239 @@
+:root {
+  --rose-50: #fff7fb;
+  --rose-100: #ffe4f1;
+  --rose-200: #ffc2dd;
+  --rose-300: #ff9ac8;
+  --rose-400: #f472b6;
+  --rose-500: #ec4899;
+  --rose-600: #db2777;
+  --rose-700: #be185d;
+  --blush: #ffd6e8;
+  --pearl: #fff9fc;
+  --ink: #5b1a3a;
+  --ink-soft: #8a3a5c;
+  --gold: #e8b86d;
+  --gold-soft: #f6d9a8;
+  --shadow: 0 18px 50px rgba(190, 24, 93, 0.18);
+  --font-display: 'Ma Shan Zheng', '微软雅黑', cursive;
+  --font-poem: 'Noto Serif SC', '宋体', serif;
+  --font-body: 'Noto Sans SC', '微软雅黑', '宋体', sans-serif;
+  --love-pink: #ffc0cb;
+  --love-ink: #1a1a1a;
+  color: var(--love-ink);
+  background: var(--love-pink);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow: hidden;
+  background: #ffc0cb;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  pointer-events: none;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: #9d174d;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.app.finale-mode .hud,
+.app.finale-mode .scene-footer {
+  display: none;
+}
+
+.progress {
+  display: flex;
+  gap: 0.45rem;
+  pointer-events: none;
+}
+
+.progress-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: rgba(190, 24, 93, 0.2);
+  transition: transform 0.35s ease, background 0.35s ease;
+}
+
+.progress-dot.active {
+  background: var(--rose-500);
+  transform: scale(1.35);
+}
+
+.progress-dot.done {
+  background: var(--rose-300);
+}
+
+.scene-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem;
+  pointer-events: none;
+}
+
+.cta {
+  pointer-events: auto;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  color: white;
+  background: linear-gradient(135deg, #e85a75, #be1a25);
+  box-shadow: 0 12px 28px rgba(190, 26, 37, 0.28);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 22px 40px rgba(190, 24, 93, 0.28);
+}
+
+.cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cta.ghost {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--rose-700);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(244, 114, 182, 0.35);
+}
+
+.scene-copy {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: min(92vw, 34rem);
+  text-align: center;
+  pointer-events: none;
+}
+
+.scene-copy h1,
+.scene-copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 8vw, 4.2rem);
+  color: #9d174d;
+  line-height: 1.15;
+}
+
+.scene-copy p {
+  margin: 0.75rem 0 0;
+  color: #4a1028;
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  line-height: 1.65;
+  font-family: '微软雅黑', 'Noto Sans SC', sans-serif;
+}
+
+.sparkle-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  opacity: 0.2;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.35);
+  }
+}
+
+.fade-panel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 640px) {
+  .hud {
+    padding: 0.85rem 1rem;
+  }
+
+  .scene-footer {
+    padding: 1rem;
+  }
+}

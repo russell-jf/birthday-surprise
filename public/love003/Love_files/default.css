@@ -1,0 +1,143 @@
+/* Based on Awesome-Love-Code Web/003 (MIT) — adapted for fullscreen embed */
+
+/* 全站统一字体：霞鹜文楷（LXGW WenKai，OFL-1.1），已按本站用字裁剪为 60KB 子集 */
+@font-face {
+	font-family: 'LoveKai';
+	src: url('./lxgwwenkai-subset.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	--font-main: 'LoveKai', 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Songti SC', serif;
+	--ink: #4a1220;
+	--ink-strong: #b3122b;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background: #ffc0cb;
+	font-size: 20px;
+	font-family: var(--font-main);
+	color: var(--ink);
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+}
+
+a {
+	color: var(--ink-strong);
+	font-size: 14px;
+	font-family: inherit;
+	text-decoration: none;
+}
+
+#main {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#wrap {
+	position: relative;
+	width: 1100px;
+	height: 680px;
+	transform-origin: center center;
+}
+
+#text {
+	width: 400px;
+	height: 480px;
+	left: 60px;
+	top: 64px;
+	position: absolute;
+	z-index: 2;
+}
+
+#code {
+	display: none;
+	font-size: 15px;
+	line-height: 1.55;
+	letter-spacing: 0.04em;
+	font-weight: 400;
+}
+
+#clock-box {
+	position: absolute;
+	left: 60px;
+	top: 556px;
+	font-size: 22px;
+	line-height: 1.4;
+	letter-spacing: 0.04em;
+	display: none;
+	z-index: 2;
+	white-space: nowrap;
+}
+
+#clock-box a {
+	font-size: 22px;
+	font-weight: 400;
+}
+
+#clock {
+	margin-left: 40px;
+	margin-top: 4px;
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: "tnum" 1;
+}
+
+#clock .digit {
+	font-size: 46px;
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+	color: var(--ink-strong);
+}
+
+#canvas {
+	margin: 0 auto;
+	width: 1100px;
+	height: 680px;
+	display: block;
+}
+
+#error {
+	margin: 0 auto;
+	text-align: center;
+	margin-top: 60px;
+	display: none;
+}
+
+.hand {
+	cursor: pointer;
+}
+
+.say {
+	margin-left: 5px;
+}
+
+.space {
+	margin-right: 150px;
+}
+
+#hint {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	transform: translateX(-50%);
+	z-index: 10;
+	padding: 8px 16px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.55);
+	font-family: inherit;
+	font-size: 15px;
+	letter-spacing: 0.06em;
+	color: #9d174d;
+	pointer-events: none;
+}

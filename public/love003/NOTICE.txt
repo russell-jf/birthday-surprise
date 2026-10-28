@@ -1,0 +1,15 @@
+This directory contains source adapted from:
+
+  https://github.com/sun0225SUN/Awesome-Love-Code
+  Web/003 — “一封情书”
+
+Licensed under the MIT License
+Copyright (c) 2022 小孙同学
+
+The original license text is included in the project README.
+Original demo: https://sun0225sun.github.io/Awesome-Love-Code/Web/003/
+
+Font:
+  LXGW WenKai (霞鹜文楷) — https://github.com/lxgw/LxgwWenKai
+  Licensed under the SIL Open Font License 1.1
+  Subset to the characters used by this page: Love_files/lxgwwenkai-subset.woff2
