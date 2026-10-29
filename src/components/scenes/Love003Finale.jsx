@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStoryConfig } from '../../context/StoryConfig'
 import StoryBackground from '../story/StoryBackground'
+import StoryLoader from '../StoryLoader'
 import './scenes.css'
 
 function escapeHtml(text) {
@@ -30,7 +31,9 @@ function buildLetterHtml(lines) {
  */
 export default function Love003Finale() {
   const { config } = useStoryConfig()
-  const [src, setSrc] = useState(`${import.meta.env.BASE_URL}love003/index.html`)
+  const [src, setSrc] = useState('')
+  const [frameReady, setFrameReady] = useState(false)
+  const [loaderOut, setLoaderOut] = useState(false)
 
   useEffect(() => {
     let revoked = ''
@@ -40,7 +43,7 @@ export default function Love003Finale() {
       try {
         const base = `${import.meta.env.BASE_URL}love003/index.html`
         const res = await fetch(base)
-        if (!res.ok) return
+        if (!res.ok) throw new Error('fetch failed')
         let html = await res.text()
         const letter = buildLetterHtml(config.letterLines)
         html = html.replace(/<div id="code">[\s\S]*?<\/div>/, `<div id="code">\n${letter}\n                </div>`)
@@ -59,9 +62,14 @@ export default function Love003Finale() {
           return
         }
         revoked = url
+        setFrameReady(false)
+        setLoaderOut(false)
         setSrc(url)
       } catch {
-        // Fall back to static embed.
+        if (cancelled) return
+        setFrameReady(false)
+        setLoaderOut(false)
+        setSrc(`${import.meta.env.BASE_URL}love003/index.html`)
       }
     })()
 
@@ -71,10 +79,27 @@ export default function Love003Finale() {
     }
   }, [config.letterLines, config.together])
 
+  useEffect(() => {
+    if (!frameReady) return undefined
+    const id = window.setTimeout(() => setLoaderOut(true), 520)
+    return () => window.clearTimeout(id)
+  }, [frameReady])
+
   return (
     <section className="scene love003-scene">
       <StoryBackground variant="blush" />
-      <iframe className="love003-frame" title="一封情书" src={src} allow="autoplay" />
+
+      {!loaderOut ? <StoryLoader done={frameReady} /> : null}
+
+      {src ? (
+        <iframe
+          className={`love003-frame${frameReady ? ' is-ready' : ''}`}
+          title="一封情书"
+          src={src}
+          allow="autoplay"
+          onLoad={() => setFrameReady(true)}
+        />
+      ) : null}
     </section>
   )
 }

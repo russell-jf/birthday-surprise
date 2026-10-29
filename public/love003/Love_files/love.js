@@ -154,29 +154,36 @@
         },
         drawText: function() {
             var ctx = this.tree.ctx, heart = this.heart;
-            var point = heart.point, color = heart.color, 
-                scale = heart.scale;
+            var point = heart.point, color = heart.color;
+            /* Draw in logical pixels (no ctx.scale) so CJK text stays sharp */
+            var x0 = point.x + 6;
+            var y0 = point.y + 4;
+            var x1 = point.x + 18;
+            var y1 = point.y + 16;
+            var x2 = point.x + 72;
             ctx.save();
             ctx.strokeStyle = color;
             ctx.fillStyle = color;
-            ctx.translate(point.x, point.y);
-            ctx.scale(scale, scale);
-            ctx.moveTo(0, 0);
-    	    ctx.lineTo(15, 15);
-    	    ctx.lineTo(60, 15);
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y1);
             ctx.stroke();
-
-            ctx.moveTo(0, 0);
-            ctx.scale(0.75, 0.75);
-            ctx.font = "13px 'LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Noto Serif SC', serif"; // 字号肿么没有用? (ˉ(∞)ˉ)
-            ctx.fillText("click here", 23, 16);
+            ctx.font = "600 14px 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif";
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText("点这里", x1 + 4, y1 - 4);
             ctx.restore();
         },
         clear: function() {
             var ctx = this.tree.ctx, cirle = this.cirle;
             var point = cirle.point, scale = cirle.scale, radius = 26;
-            var w = h = (radius * scale);
-            ctx.clearRect(point.x - w, point.y - h, 4 * w, 4 * h);
+            var w = Math.max(radius * scale * 4, 90);
+            var h = Math.max(radius * scale * 4, 48);
+            ctx.clearRect(point.x - w * 0.35, point.y - h * 0.55, w, h);
         },
         hover: function(x, y) {
             var ctx = this.tree.ctx;

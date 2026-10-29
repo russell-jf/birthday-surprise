@@ -250,6 +250,19 @@
   height: 100%;
   border: 0;
   background: var(--love-pink);
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  z-index: 2;
+}
+
+.love003-frame.is-ready {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .love003-frame {
+    transition: none;
+  }
 }
 
 /* Cake */

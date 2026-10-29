@@ -511,6 +511,105 @@ img {
   place-items: center;
   font-family: var(--font-body);
   color: var(--ink-title);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Shared loading effect — soft rose heartbeat */
+.story-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 58% 48% at 50% 46%, rgba(255, 255, 255, 0.5), transparent 68%),
+    linear-gradient(165deg, var(--rose-50) 0%, var(--love-pink) 52%, var(--love-deep) 100%);
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.story-loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.story-loader__bloom {
+  position: absolute;
+  width: min(52vw, 13rem);
+  height: min(52vw, 13rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(236, 72, 153, 0.22) 0%,
+    rgba(255, 192, 203, 0.18) 42%,
+    transparent 70%
+  );
+  animation: storyHeartBloom 1.15s ease-in-out infinite;
+}
+
+.story-loader__heart {
+  position: relative;
+  z-index: 1;
+  width: clamp(2.75rem, 11vw, 3.35rem);
+  height: auto;
+  line-height: 0;
+  filter: drop-shadow(0 10px 22px rgba(190, 24, 93, 0.28));
+  animation: storyHeartbeat 1.15s ease-in-out infinite;
+  transform-origin: 50% 55%;
+}
+
+.story-loader__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Double-beat: lub-dub */
+@keyframes storyHeartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.14);
+  }
+  22% {
+    transform: scale(0.96);
+  }
+  34% {
+    transform: scale(1.1);
+  }
+  48% {
+    transform: scale(1);
+  }
+}
+
+@keyframes storyHeartBloom {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.86);
+  }
+  12% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+  22% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  34% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+  48% {
+    opacity: 0.45;
+    transform: scale(0.86);
+  }
 }
 
 @media (max-width: 640px) {
@@ -539,9 +638,15 @@ img {
   .sparkle,
   .progress-dot,
   .story-btn,
-  .cta {
+  .cta,
+  .story-loader__bloom,
+  .story-loader__heart {
     animation: none !important;
     transition: none !important;
+  }
+
+  .story-loader {
+    transition: none;
   }
 
   .story-btn:hover:not(:disabled),

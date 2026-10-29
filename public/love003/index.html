@@ -62,7 +62,6 @@
                 <div id="clock"></div>
             </div>
         </div>
-        <div id="happy-birthday" aria-hidden="true">Happy Birthday</div>
     </div>
     <div id="hint">点击粉色小种子，看爱心树长大 ♡</div>
 
@@ -75,14 +74,46 @@
             /* 1ms still yields so reduced-motion can fast-forward without freezing the tab */
             var frameMs = reduceMotion ? 1 : 10;
 
+            var coarsePointer = window.matchMedia('(pointer: coarse)').matches
+                || ('ontouchstart' in window)
+                || (navigator.maxTouchPoints > 0);
+            var narrowView = function () {
+                return window.innerWidth <= 720 || window.innerHeight > window.innerWidth;
+            };
+
             function fitWrap() {
                 var wrap = document.getElementById('wrap');
                 if (!wrap) return;
-                wrapScale = Math.min(window.innerWidth / LOGICAL_W, window.innerHeight / LOGICAL_H) * 0.96;
+                var sw = window.innerWidth;
+                var sh = window.innerHeight;
+                var letterMode = document.body.classList.contains('letter-mobile');
+                if (letterMode) {
+                    wrapScale = Math.min(sw / 640, sh / 620);
+                    wrap.style.transform = 'scale(' + wrapScale + ') translateY(18%)';
+                    return;
+                }
+                if (narrowView()) {
+                    /*
+                     * Landscape art (1100×680) letterboxes badly on phones if we
+                     * only "contain". Scale up so the seed/tree dominate the
+                     * viewport (slight side crop is OK).
+                     */
+                    wrapScale = Math.min(sw / 560, sh / 540);
+                } else {
+                    wrapScale = Math.min(sw / LOGICAL_W, sh / LOGICAL_H) * 0.96;
+                }
                 wrap.style.transform = 'scale(' + wrapScale + ')';
             }
             fitWrap();
             window.addEventListener('resize', fitWrap);
+            window.addEventListener('orientationchange', function () {
+                setTimeout(fitWrap, 80);
+            });
+
+            if (coarsePointer) {
+                var hintEl = document.getElementById('hint');
+                if (hintEl) hintEl.textContent = '轻触屏幕任意处，看爱心树长大 ♡';
+            }
 
             /** Wait ms, but freeze while the tab is hidden. */
             var waitVisible = eval(Jscex.compile("async", function (ms) {
@@ -117,7 +148,7 @@
                 seed: {
                     x: width / 2 - 20,
                     color: "rgb(190, 26, 37)",
-                    scale: 2
+                    scale: narrowView() ? 1.55 : 1.35
                 },
                 branch: [
                     [535, 680, 570, 250, 500, 200, 30, 100, [
@@ -169,8 +200,9 @@
 
             /**
              * seed.hover uses getImageData which is in device pixels after DPR
-             * setTransform — on mobile (dpr>1) logical coords always miss. Also
-             * enlarge the hit radius so fat-finger taps register.
+             * setTransform — on mobile (dpr>1) logical coords always miss.
+             * Hit radius is measured in screen space (~52px) so CSS scale on
+             * phones does not shrink the tap target to an unusable speck.
              */
             function hitSeed(x, y) {
                 var px = Math.round(x * dpr);
@@ -184,17 +216,30 @@
                 var p = seed.heart.point;
                 var dx = x - p.x;
                 var dy = y - p.y;
-                return dx * dx + dy * dy <= 56 * 56;
+                var screenR = coarsePointer ? 72 : 52;
+                var r = Math.max(64, screenR / Math.max(wrapScale, 0.05));
+                return dx * dx + dy * dy <= r * r;
+            }
+
+            function plantSeed() {
+                if (!hold) return;
+                hold = 0;
+                canvas.off('.seed');
+                $(document).off('.seed');
+                canvas.removeClass('hand');
+                $('#hint').fadeOut(400);
             }
 
             function tryPlant(e) {
                 if (!hold) return;
+                /* Touch / coarse pointers: any tap starts the tree (seed is tiny when scaled). */
+                if (coarsePointer) {
+                    plantSeed();
+                    return;
+                }
                 var pt = logicalPoint(e);
                 if (!hitSeed(pt.x, pt.y)) return;
-                hold = 0;
-                canvas.off('.seed');
-                canvas.removeClass('hand');
-                $('#hint').fadeOut(400);
+                plantSeed();
             }
 
             canvas.on('click.seed', tryPlant);
@@ -202,6 +247,16 @@
                 e.preventDefault();
                 tryPlant(e);
             });
+            /* Capture taps that land outside the scaled wrap (letter of empty pink). */
+            if (coarsePointer) {
+                $(document).on('touchend.seed click.seed', function (e) {
+                    if (!hold) return;
+                    var t = e.target;
+                    if (t && (t.id === 'hint' || (t.closest && t.closest('#error')))) return;
+                    e.preventDefault();
+                    plantSeed();
+                });
+            }
             canvas.on('mousemove.seed', function (e) {
                 var pt = logicalPoint(e);
                 canvas.toggleClass('hand', hitSeed(pt.x, pt.y));
@@ -238,13 +293,20 @@
             }));
 
             var moveAnimate = eval(Jscex.compile("async", function () {
-                tree.snapshot("p1", 240, 0, 610, 680);
-                while (tree.move("p1", 500, 0)) {
+                /* Desktop: slide tree right to leave room for the letter.
+                   Mobile: keep tree centered as atmosphere behind the letter wash. */
+                if (!narrowView()) {
+                    tree.snapshot("p1", 240, 0, 610, 680);
+                    while (tree.move("p1", 500, 0)) {
+                        foot.draw();
+                        $await(waitVisible(frameMs));
+                    }
                     foot.draw();
-                    $await(waitVisible(frameMs));
+                    tree.snapshot("p2", 500, 0, 610, 680);
+                } else {
+                    tree.snapshot("p1", 240, 0, 610, 680);
+                    foot.draw();
                 }
-                foot.draw();
-                tree.snapshot("p2", 500, 0, 610, 680);
 
                 canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
                 canvas.css("background", "#ffc0cb");
@@ -276,6 +338,15 @@
                 together.setMilliseconds(0);
 
                 $("#letter-panel").addClass("active");
+                if (narrowView()) {
+                    document.body.classList.add("letter-mobile");
+                    /* Settle the tree lower so the letter wash can own the top */
+                    wrapScale = Math.min(window.innerWidth / 640, window.innerHeight / 620);
+                    var wrapEl = document.getElementById("wrap");
+                    if (wrapEl) {
+                        wrapEl.style.transform = "scale(" + wrapScale + ") translateY(18%)";
+                    }
+                }
                 if (reduceMotion) {
                     $("#code").show();
                 } else {

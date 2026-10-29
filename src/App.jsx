@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { SCENES } from './data/content'
 import { StoryConfigProvider, useStoryConfig } from './context/StoryConfig'
 import SceneChrome from './components/SceneChrome'
+import StoryLoader from './components/StoryLoader'
 import StoryTransition from './components/StoryTransition'
 import StarryOpening from './components/scenes/StarryOpening'
 import FireworksScene from './components/scenes/FireworksScene'
@@ -11,10 +12,6 @@ import { ensureSceneHash, hashForScene, sceneIndexFromHash } from './utils/scene
 const HeartScene = lazy(() => import('./components/scenes/HeartScene'))
 const AlbumScene = lazy(() => import('./components/scenes/AlbumScene'))
 const CakeScene = lazy(() => import('./components/scenes/CakeScene'))
-
-function SceneFallback() {
-  return <div className="fade-panel">加载中…</div>
-}
 
 function clampScene(index) {
   return Math.max(0, Math.min(index, SCENES.length - 1))
@@ -148,7 +145,7 @@ function StoryApp() {
   }, [goNext, goPrev])
 
   if (!ready) {
-    return <div className="fade-panel">加载惊喜中…</div>
+    return <StoryLoader />
   }
 
   if (error) {
@@ -167,7 +164,7 @@ function StoryApp() {
       </h2>
 
       <div className="scene-layer">
-        <Suspense fallback={<SceneFallback />}>
+        <Suspense fallback={<StoryLoader />}>
           <StoryTransition sceneKey={sceneKey}>
             {sceneIndex === 0 && <StarryOpening onReady={handleOpeningReady} />}
             {sceneIndex === 1 && (

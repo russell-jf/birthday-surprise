@@ -7,12 +7,13 @@ var $win = $(window);
 var clientWidth = $win.width();
 var clientHeight = $win.height();
 
+/*
+ * Original demo reloaded on any width+height change. That breaks mobile
+ * (URL bar show/hide) and blob/iframe embeds — keep size vars only.
+ */
 $(window).resize(function() {
-    var newWidth = $win.width();
-    var newHeight = $win.height();
-    if (newWidth != clientWidth && newHeight != clientHeight) {
-        location.replace(location);
-    }
+    clientWidth = $win.width();
+    clientHeight = $win.height();
 });
 
 (function($) {
