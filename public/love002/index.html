@@ -2,8 +2,9 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <title>爱心</title>
+    <title>玫瑰</title>
     <meta name="describe" content="Based on Awesome-Love-Code Web/002 (MIT License)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <style>
       html,
       body {
@@ -11,7 +12,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #ffc0cb;
+        background: transparent;
       }
 
       body {
@@ -33,6 +34,18 @@
         display: block;
         width: 100%;
         height: 100%;
+      }
+
+      /* 移动端：玫瑰视觉重心上移，整体水平垂直居中 */
+      @media (max-width: 640px) {
+        .container {
+          width: min(92vw, 78dvh);
+          height: min(92vw, 78dvh);
+          max-width: none;
+          max-height: none;
+          /* 花头偏画布上方，略下移让整朵玫瑰落在视口中心 */
+          transform: translateY(6%);
+        }
       }
     </style>
   </head>

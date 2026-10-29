@@ -1,10 +1,10 @@
 export const NICKNAME = '宝宝'
 
-export const BIRTH_DATE = '2026 11 26'
+export const BIRTH_DATE = 'NOVEMBER 26, 2026'
 
 export const SCENES = [
   { id: 'stars', label: '星空' },
-  { id: 'heart', label: '爱心' },
+  { id: 'heart', label: '玫瑰' },
   { id: 'album', label: '相册' },
   { id: 'cake', label: '蛋糕' },
   { id: 'finale', label: '烟花' },
@@ -24,12 +24,12 @@ const asset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
 export const MEMORIES = [
   {
     src: asset('image/1.jpg'),
-    title: '第一次见面',
+    title: '青岛回忆',
     caption: '那天阳光刚好，世界忽然变得柔软。',
   },
   {
     src: asset('image/2.jpg'),
-    title: '一起走过的路',
+    title: '一起走过的琴屿路',
     caption: '手牵手也好，肩并肩也好，都是我最喜欢的风景。',
   },
   {
@@ -39,7 +39,7 @@ export const MEMORIES = [
   },
   {
     src: asset('image/4.jpg'),
-    title: '小小的约定',
+    title: '三周年',
     caption: '我们说好，要把平凡日子过成童话。',
   },
   {

@@ -11,7 +11,7 @@ const CakeScene = lazy(() => import('./components/scenes/CakeScene'))
 
 const CTA_LABELS = [
   '进入惊喜',
-  '翻开相册',
+  '开启我们的故事',
   '去吹蜡烛',
   '倒数烟花',
   '打开情书',
@@ -29,6 +29,8 @@ function SceneFallback() {
 export default function App() {
   const [sceneIndex, setSceneIndex] = useState(0)
   const [openingReady, setOpeningReady] = useState(false)
+  const [heartReady, setHeartReady] = useState(false)
+  const [heartOpening, setHeartOpening] = useState(false)
   const [cakeDone, setCakeDone] = useState(false)
 
   const goNext = useCallback(() => {
@@ -36,10 +38,27 @@ export default function App() {
   }, [])
 
   const handleOpeningReady = useCallback(() => setOpeningReady(true), [])
+  const handleHeartReady = useCallback(() => setHeartReady(true), [])
+  const handleHeartOpened = useCallback(() => {
+    setHeartOpening(false)
+    setHeartReady(false)
+    goNext()
+  }, [goNext])
   const handleCakeDone = useCallback(() => setCakeDone(true), [])
 
+  const handleCta = useCallback(() => {
+    if (sceneIndex === 1) {
+      if (heartOpening) return
+      setHeartOpening(true)
+      return
+    }
+    goNext()
+  }, [sceneIndex, heartOpening, goNext])
+
   const ctaDisabled =
-    (sceneIndex === 0 && !openingReady) || (sceneIndex === 3 && !cakeDone)
+    (sceneIndex === 0 && !openingReady) ||
+    (sceneIndex === 1 && (!heartReady || heartOpening)) ||
+    (sceneIndex === 3 && !cakeDone)
 
   const showCta = sceneIndex < SCENES.length - 1
   const chromeHidden = sceneIndex === SCENES.length - 1
@@ -49,7 +68,13 @@ export default function App() {
       <div className="scene-layer">
         <Suspense fallback={<SceneFallback />}>
           {sceneIndex === 0 && <StarryOpening onReady={handleOpeningReady} />}
-          {sceneIndex === 1 && <HeartScene />}
+          {sceneIndex === 1 && (
+            <HeartScene
+              onReady={handleHeartReady}
+              opening={heartOpening}
+              onOpened={handleHeartOpened}
+            />
+          )}
           {sceneIndex === 2 && <AlbumScene />}
           {sceneIndex === 3 && <CakeScene onExtinguished={handleCakeDone} />}
           {sceneIndex === 4 && <FireworksScene />}
@@ -62,7 +87,7 @@ export default function App() {
           sceneIndex={sceneIndex}
           showCta={showCta}
           ctaLabel={CTA_LABELS[sceneIndex] ?? '继续'}
-          onCta={goNext}
+          onCta={handleCta}
           ctaDisabled={ctaDisabled}
         />
       ) : null}
