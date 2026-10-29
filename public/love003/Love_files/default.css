@@ -1,30 +1,28 @@
 /* Based on Awesome-Love-Code Web/003 (MIT) — adapted for fullscreen embed */
-
-/* 霞鹜文楷：本地子集兜底 + Google Fonts 全字库 */
-@font-face {
-	font-family: 'LoveKai';
-	src: url('./lxgwwenkai-subset.woff2') format('woff2');
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
-}
+/* Fonts aligned with the React storybook: display / body / ui */
 
 :root {
-	--font-main: 'LXGW WenKai', 'LoveKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Songti SC', serif;
+	--font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+	--font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+	--font-ui: 'Outfit', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+	--font-main: var(--font-body);
 	--ink: #4a1220;
 	--ink-strong: #b3122b;
+	--ink-title: #9d174d;
+	--love-pink: #ffc0cb;
 }
 
 body {
 	margin: 0;
 	padding: 0;
-	background: #ffc0cb;
+	background: var(--love-pink);
 	font-size: 20px;
-	font-family: var(--font-main);
+	font-family: var(--font-body);
 	color: var(--ink);
 	overflow: hidden;
 	width: 100vw;
 	height: 100vh;
+	height: 100dvh;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
@@ -89,12 +87,15 @@ a {
 #clock {
 	margin-left: 40px;
 	margin-top: 4px;
+	font-family: var(--font-ui);
 	font-variant-numeric: tabular-nums;
 	font-feature-settings: "tnum" 1;
 }
 
 #clock .digit {
+	font-family: var(--font-ui);
 	font-size: 46px;
+	font-weight: 500;
 	line-height: 1.1;
 	letter-spacing: 0.02em;
 	color: var(--ink-strong);
@@ -129,16 +130,17 @@ a {
 #hint {
 	position: fixed;
 	left: 50%;
-	bottom: 24px;
+	bottom: max(24px, env(safe-area-inset-bottom, 0px));
 	transform: translateX(-50%);
 	z-index: 10;
 	padding: 8px 16px;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.55);
-	font-family: inherit;
+	background: rgba(255, 255, 255, 0.62);
+	border: 1px solid rgba(190, 26, 37, 0.22);
+	font-family: var(--font-body);
 	font-size: 15px;
 	letter-spacing: 0.06em;
-	color: #9d174d;
+	color: var(--ink-title);
 	pointer-events: none;
 }
 
@@ -150,11 +152,12 @@ a {
 	z-index: 6;
 	margin: 0;
 	padding: 0 0.15em;
-	font-family: var(--font-main);
-	font-size: 68px;
-	font-weight: 400;
+	font-family: var(--font-display);
+	font-size: 72px;
+	font-weight: 500;
+	font-style: italic;
 	line-height: 1.1;
-	letter-spacing: 0.06em;
+	letter-spacing: 0.04em;
 	white-space: nowrap;
 	color: #be1a25;
 	text-shadow:

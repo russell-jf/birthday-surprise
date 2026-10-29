@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
+import { MOTION, prefersReducedMotion } from '../../styles/motion'
+import StoryBackground from '../story/StoryBackground'
 import './scenes.css'
 
 const PETAL_COUNT = 28
-const STAR_COUNT = 48
+const PETAL_COUNT_REDUCED = 12
 
 /**
- * Embeds Awesome-Love-Code Web/002 (MIT) — canvas 玫瑰.
- * Source lives in /public/love002
- *
+ * Embeds Awesome-Love-Code Web/002 (MIT) — canvas rose.
  * Phase 1: fade in + rise + sway + starlight
  * Phase 2: petal scatter + slight zoom → onOpened
  */
@@ -16,20 +17,33 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
   const rootRef = useRef(null)
   const stageRef = useRef(null)
   const swayTween = useRef(null)
+  const reducedMotion = useReducedMotion()
   const onReadyRef = useRef(onReady)
   const onOpenedRef = useRef(onOpened)
-  onReadyRef.current = onReady
-  onOpenedRef.current = onOpened
 
-  // Phase 1 — 登场
   useEffect(() => {
+    onReadyRef.current = onReady
+  }, [onReady])
+
+  useEffect(() => {
+    onOpenedRef.current = onOpened
+  }, [onOpened])
+
+  useEffect(() => {
+    const reduced = prefersReducedMotion()
+
     const ctx = gsap.context(() => {
-      const stars = gsap.utils.toArray('.heart-star')
       const stage = stageRef.current
 
+      if (reduced) {
+        gsap.set(rootRef.current, { opacity: 1 })
+        gsap.set(stage, { y: 0, scale: 1 })
+        onReadyRef.current?.()
+        return
+      }
+
       gsap.set(rootRef.current, { opacity: 0 })
-      gsap.set(stage, { y: '42%', scale: 0.92, transformOrigin: '50% 60%' })
-      gsap.set(stars, { opacity: 0, scale: 0.2 })
+      gsap.set(stage, { y: '36%', scale: 0.94, transformOrigin: '50% 60%' })
 
       const tl = gsap.timeline({
         onComplete: () => onReadyRef.current?.(),
@@ -37,39 +51,26 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
 
       tl.to(rootRef.current, {
         opacity: 1,
-        duration: 1.1,
-        ease: 'power2.out',
-      })
-        .to(
-          stage,
-          {
-            y: 0,
-            scale: 1,
-            duration: 2.2,
-            ease: 'power3.out',
-          },
-          0.15,
-        )
-        .to(
-          stars,
-          {
-            opacity: () => gsap.utils.random(0.25, 0.95),
-            scale: 1,
-            duration: 1.6,
-            stagger: { each: 0.025, from: 'random' },
-            ease: 'power2.out',
-          },
-          0.45,
-        )
+        duration: MOTION.soft,
+        ease: MOTION.easeOut,
+      }).to(
+        stage,
+        {
+          y: 0,
+          scale: 1,
+          duration: 2,
+          ease: MOTION.easeLift,
+        },
+        0.12,
+      )
 
-      // 花瓣轻微摆动
       swayTween.current = gsap.to(stage, {
-        rotation: 2.2,
+        rotation: 2,
         duration: 2.8,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: -1,
-        delay: 2.1,
+        delay: 1.9,
       })
     }, rootRef)
 
@@ -79,13 +80,18 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
     }
   }, [])
 
-  // Phase 2 — 点击开启
   useEffect(() => {
-    if (!opening) return
+    if (!opening) return undefined
 
     const stage = stageRef.current
     const petals = gsap.utils.toArray('.heart-scatter-petal', rootRef.current)
     swayTween.current?.kill()
+    const reduced = prefersReducedMotion()
+
+    if (reduced) {
+      onOpenedRef.current?.()
+      return undefined
+    }
 
     const tl = gsap.timeline({
       onComplete: () => onOpenedRef.current?.(),
@@ -102,20 +108,20 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
     tl.to(
       stage,
       {
-        scale: 1.18,
+        scale: 1.16,
         opacity: 0.15,
         rotation: 0,
-        duration: 1.15,
-        ease: 'power2.inOut',
+        duration: MOTION.emphasis,
+        ease: MOTION.easeSoft,
       },
       0,
     )
       .to(
         rootRef.current,
         {
-          scale: 1.06,
-          duration: 1.15,
-          ease: 'power2.inOut',
+          scale: 1.05,
+          duration: MOTION.emphasis,
+          ease: MOTION.easeSoft,
           transformOrigin: '50% 50%',
         },
         0,
@@ -139,7 +145,7 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
           opacity: 0,
           duration: 1.05,
           stagger: { each: 0.018, from: 'center' },
-          ease: 'power2.out',
+          ease: MOTION.easeOut,
         },
         0.12,
       )
@@ -147,8 +153,8 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
         rootRef.current,
         {
           opacity: 0,
-          duration: 0.35,
-          ease: 'power1.in',
+          duration: MOTION.fadeOut,
+          ease: MOTION.easeIn,
         },
         0.85,
       )
@@ -156,21 +162,7 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
     return () => tl.kill()
   }, [opening])
 
-  const stars = Array.from({ length: STAR_COUNT }, (_, i) => (
-    <span
-      key={i}
-      className="heart-star"
-      style={{
-        left: `${(i * 19) % 100}%`,
-        top: `${(i * 31) % 100}%`,
-        width: `${1 + (i % 3)}px`,
-        height: `${1 + (i % 3)}px`,
-        animationDelay: `${(i % 8) * 0.22}s`,
-      }}
-    />
-  ))
-
-  const petals = Array.from({ length: PETAL_COUNT }, (_, i) => (
+  const petals = Array.from({ length: reducedMotion ? PETAL_COUNT_REDUCED : PETAL_COUNT }, (_, i) => (
     <span
       key={i}
       className="heart-scatter-petal"
@@ -185,10 +177,7 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
 
   return (
     <section ref={rootRef} className="scene heart-scene">
-      <div className="heart-sky" aria-hidden />
-      <div className="heart-star-field" aria-hidden>
-        {stars}
-      </div>
+      <StoryBackground variant="glow" stars starCount={40} />
 
       <div ref={stageRef} className="heart-stage">
         <iframe

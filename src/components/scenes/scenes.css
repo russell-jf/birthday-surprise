@@ -1,110 +1,45 @@
+/* Scene surfaces — same blush storybook, local focal points only */
+
 .scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
 
-.stars-scene {
-  background:
-    radial-gradient(circle at 78% 16%, rgba(255, 255, 255, 0.45), transparent 26%),
-    linear-gradient(165deg, #ffe4ec 0%, #ffc0cb 48%, #ffb0c4 100%);
+.stars-scene,
+.heart-scene,
+.album-wall-scene,
+.cake-scene,
+.finale-scene,
+.love003-scene {
+  background: linear-gradient(165deg, #ffe4ec 0%, var(--love-pink) 48%, var(--love-deep) 100%);
 }
 
-.night-sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 70% 18%, rgba(255, 255, 255, 0.35), transparent 28%),
-    radial-gradient(circle at 20% 70%, rgba(255, 154, 200, 0.35), transparent 35%);
+.album-scene {
+  background: linear-gradient(160deg, var(--pearl), var(--rose-100) 50%, var(--rose-200));
 }
 
-.star-field {
-  position: absolute;
-  inset: 0;
+.letter-scene,
+.letter-scene-poem {
+  background: linear-gradient(165deg, var(--pearl), var(--rose-100) 60%, var(--blush));
 }
 
-.star-dot {
-  position: absolute;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
-  animation: starPulse 3.2s ease-in-out infinite;
-}
-
-@keyframes starPulse {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.moon {
-  position: absolute;
-  top: 12%;
-  right: 14%;
-  width: clamp(4rem, 12vw, 7rem);
-  height: clamp(4rem, 12vw, 7rem);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff7fb, #ffc2dd 70%, #f9a8d4);
-  box-shadow: 0 0 40px rgba(255, 194, 221, 0.55);
-  opacity: 0.9;
-}
-
-.stars-copy h1,
-.stars-copy .type-line {
-  color: #9d174d;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
-}
-
+/* Opening */
 .stars-copy .type-line {
   min-height: 1.8em;
-  font-size: clamp(1.05rem, 3vw, 1.35rem);
-  font-family: var(--font-main);
-  color: #4a1028;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 3vw, 1.32rem);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
+/* Heart / rose */
 .heart-scene {
-  background:
-    radial-gradient(circle at 72% 18%, rgba(255, 255, 255, 0.4), transparent 28%),
-    radial-gradient(circle at 18% 78%, rgba(255, 154, 200, 0.35), transparent 36%),
-    linear-gradient(165deg, #ffe4ec 0%, #ffc0cb 52%, #ffb0c4 100%);
   transform-origin: 50% 50%;
-}
-
-.heart-sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.22), transparent 42%);
-  pointer-events: none;
-}
-
-.heart-star-field {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.heart-star {
-  position: absolute;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-  animation: heartStarTwinkle 3.4s ease-in-out infinite;
-}
-
-@keyframes heartStarTwinkle {
-  0%,
-  100% {
-    opacity: 0.28;
-  }
-  50% {
-    opacity: 1;
-  }
 }
 
 .heart-stage {
@@ -153,8 +88,7 @@
 
 @media (max-width: 640px) {
   .heart-stage {
-    /* 为顶栏与底部按钮留白，玫瑰落在中间安全区 */
-    inset: 8% 0 14%;
+    inset: var(--chrome-top) 0 var(--chrome-bottom);
   }
 
   .love002-frame {
@@ -165,43 +99,10 @@
   }
 }
 
-.cake-scene {
-  background: linear-gradient(180deg, #ffe4ec 0%, #ffc0cb 55%, #ffb0c4 100%);
-}
-
-.cake-scene .scene-copy h2,
-.cake-scene .scene-copy p {
-  color: #9d174d;
-  text-shadow: none;
-}
-
-.finale-copy h1,
-.finale-copy p {
-  color: #9d174d;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
+/* Album wall */
 .r3f-stage {
   position: absolute;
   inset: 18% 0 0;
-}
-
-.album-scene {
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 194, 221, 0.55), transparent 40%),
-    linear-gradient(160deg, #fff7fb, #ffe4f1 50%, #ffc2dd);
-}
-
-.album-wall-scene {
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.35), transparent 40%),
-    linear-gradient(165deg, #ffe4ec 0%, #ffc0cb 55%, #ff9eb8 100%);
-}
-
-.album-wall-scene .wall-copy h2,
-.album-wall-scene .wall-copy p {
-  color: #9d174d;
-  text-shadow: none;
 }
 
 .wall-stage {
@@ -214,18 +115,20 @@
   width: 110px;
   height: 110px;
   padding: 0;
-  border: 1px solid rgba(190, 26, 37, 0.28);
-  border-radius: 0.45rem;
-  box-shadow: 0 0 14px rgba(190, 26, 37, 0.22);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius-sm);
+  box-shadow: 0 0 14px rgba(190, 26, 37, 0.18);
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow var(--dur-mid) var(--ease-soft), border-color var(--dur-mid) var(--ease-soft);
 }
 
-.wall-card:hover {
-  border-color: rgba(190, 26, 37, 0.65);
-  box-shadow: 0 0 22px rgba(190, 26, 37, 0.4);
+.wall-card:hover,
+.wall-card:focus-visible {
+  border-color: rgba(190, 26, 37, 0.55);
+  box-shadow: 0 0 22px rgba(190, 26, 37, 0.32);
+  outline: none;
 }
 
 .wall-card img {
@@ -240,40 +143,26 @@
   position: absolute;
   right: 6px;
   top: 4px;
-  font-size: 0.7rem;
-  color: #9d174d;
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-title);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
 }
 
 .wall-menu {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 5.4rem;
+  bottom: var(--chrome-bottom);
   z-index: 30;
   display: flex;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
-  padding: 0 1rem;
-}
-
-.wall-btn {
-  color: #9d174d;
-  background: rgba(255, 255, 255, 0.35);
-  outline: 1px solid rgba(190, 26, 37, 0.45);
-  border: 0;
-  border-radius: 999px;
-  padding: 0.45rem 0.95rem;
-  font-size: 0.88rem;
-  letter-spacing: 0.06em;
-  font-family: var(--font-main);
-}
-
-.wall-btn:hover,
-.wall-btn.active {
-  background: rgba(190, 26, 37, 0.78);
-  color: #fff;
+  padding: 0 var(--page-pad-x);
+  pointer-events: auto;
 }
 
 .wall-preview {
@@ -283,12 +172,12 @@
   transform: translate(-50%, -50%);
   z-index: 35;
   width: min(88vw, 22rem);
-  padding: 1rem;
-  border-radius: 0.85rem;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(190, 26, 37, 0.25);
-  box-shadow: 0 12px 40px rgba(190, 26, 37, 0.2);
-  color: #4a1028;
+  padding: 1.1rem 1rem 1.15rem;
+  border-radius: var(--card-radius);
+  background: var(--surface-strong);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow);
+  color: var(--ink);
   text-align: center;
   backdrop-filter: blur(10px);
 }
@@ -297,47 +186,51 @@
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 0.5rem;
+  border-radius: var(--card-radius-sm);
   margin-bottom: 0.75rem;
 }
 
 .wall-preview h3 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 400;
-  color: #9d174d;
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-title);
 }
 
 .wall-preview p {
-  margin: 0.4rem 0 0;
+  margin: 0.45rem 0 0;
+  font-family: var(--font-body);
   font-size: 0.92rem;
-  line-height: 1.55;
-  color: #4a1028;
+  line-height: var(--leading-body);
+  color: var(--ink);
 }
 
 .wall-preview-close {
   position: absolute;
   right: 0.7rem;
   top: 0.55rem;
-  color: #9d174d;
-  font-size: 0.85rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-title);
   opacity: 0.85;
+  min-height: 2rem;
+  padding: 0 0.35rem;
 }
 
-.love003-scene {
-  background: #ffc0cb;
-}
-
+/* Love003 embed */
 .love003-frame {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
-  background: #ffc0cb;
+  background: var(--love-pink);
 }
 
+/* Cake */
 .cake-stage {
   inset: 16% 0 22%;
 }
@@ -345,7 +238,7 @@
 .cake-controls {
   position: absolute;
   left: 50%;
-  bottom: 5.5rem;
+  bottom: var(--chrome-bottom);
   transform: translateX(-50%);
   z-index: 25;
   display: flex;
@@ -357,9 +250,9 @@
 
 .mic-meter {
   width: 100%;
-  height: 0.45rem;
+  height: 0.4rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.35);
   overflow: hidden;
 }
 
@@ -371,27 +264,17 @@
 
 .mic-hint {
   margin: 0;
-  color: #9d174d;
+  font-family: var(--font-body);
+  color: var(--ink-title);
   font-size: 0.85rem;
+  letter-spacing: 0.02em;
 }
 
 .mic-hint.hot {
-  color: #be185d;
+  color: var(--rose-700);
 }
 
-.letter-scene {
-  background:
-    radial-gradient(circle at 80% 10%, rgba(255, 214, 232, 0.8), transparent 35%),
-    linear-gradient(165deg, #fff9fc, #ffe4f1 60%, #ffd6e8);
-}
-
-.letter-scene-poem {
-  background:
-    radial-gradient(circle at 85% 12%, rgba(255, 255, 255, 0.55), transparent 28%),
-    radial-gradient(circle at 12% 78%, rgba(255, 154, 200, 0.45), transparent 32%),
-    linear-gradient(165deg, #ffd6e8 0%, #ffc0cb 42%, #ffb7d5 100%);
-}
-
+/* Letter (legacy classes kept for safety) */
 .letter-wash {
   position: absolute;
   inset: 0;
@@ -437,57 +320,57 @@
 
 .letter-head h2 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2.4rem, 8vw, 3.6rem);
-  font-weight: 400;
-  color: #9d174d;
-  line-height: 1.1;
+  font-family: var(--font-body);
+  font-size: var(--text-title);
+  font-weight: var(--weight-title);
+  color: var(--ink-title);
+  line-height: var(--leading-title);
 }
 
 .letter-head p {
   margin: 0.35rem 0 0;
-  color: #8a3a5c;
+  color: var(--ink-soft);
   font-size: 0.95rem;
+  font-family: var(--font-body);
 }
 
 .poem-panel {
-  width: min(92vw, 36rem);
+  width: min(92vw, var(--page-max));
   max-height: min(58dvh, 28rem);
   overflow: auto;
   padding: 1.35rem 1.4rem 1.6rem;
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 1.1rem;
-  box-shadow: 0 18px 50px rgba(190, 24, 93, 0.16);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
   backdrop-filter: blur(8px);
 }
 
 .poem-line {
   margin: 0 0 0.55rem;
   min-height: 1.45em;
-  color: #4c0519;
-  font-family: var(--font-poem);
-  font-size: clamp(1.15rem, 3.2vw, 1.45rem);
-  line-height: 1.7;
-  letter-spacing: 0.04em;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: clamp(1.05rem, 3vw, 1.3rem);
+  line-height: var(--leading-body);
+  letter-spacing: 0.03em;
 }
 
 .poem-line.title {
-  font-family: var(--font-display);
-  font-size: clamp(1.7rem, 5vw, 2.35rem);
-  color: #9d174d;
+  font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+  font-weight: 500;
+  color: var(--ink-title);
   margin-bottom: 0.85rem;
 }
 
 .poem-line.emphasis {
-  color: #be185d;
+  color: var(--rose-700);
 }
 
 .poem-line.sign {
   text-align: right;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
-  color: #be185d;
+  font-size: clamp(1.2rem, 3.2vw, 1.55rem);
+  color: var(--rose-700);
   margin-top: 0.6rem;
 }
 
@@ -498,7 +381,7 @@
 .caret {
   display: inline-block;
   margin-left: 1px;
-  color: #db2777;
+  color: var(--rose-600);
   animation: blink 0.9s step-end infinite;
 }
 
@@ -515,10 +398,10 @@
   gap: 0.55rem;
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  color: #9d174d;
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  transition: opacity 0.6s var(--ease-soft), transform 0.6s var(--ease-soft);
+  color: var(--ink-title);
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 3.2vw, 1.45rem);
 }
 
 .letter-foot.show {
@@ -534,17 +417,13 @@
   box-shadow: 0 0 12px rgba(255, 194, 221, 0.9);
 }
 
-.finale-scene {
-  background:
-    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.4), transparent 40%),
-    linear-gradient(165deg, #ffe4ec 0%, #ffc0cb 55%, #ff9eb8 100%);
-}
-
+/* Fireworks */
 .finale-glow {
   position: absolute;
   inset: 20% 10%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.45), transparent 65%);
   filter: blur(10px);
+  pointer-events: none;
 }
 
 .countdown {
@@ -553,19 +432,24 @@
   display: grid;
   place-content: center;
   text-align: center;
-  color: #9d174d;
+  color: var(--ink-title);
 }
 
 .countdown-num {
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: clamp(5rem, 22vw, 9rem);
+  font-weight: 500;
   line-height: 1;
-  animation: popIn 0.55s ease;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  animation: popIn 0.55s var(--ease-out);
 }
 
 .countdown p {
   margin: 0.5rem 0 0;
+  font-family: var(--font-body);
   letter-spacing: 0.12em;
+  font-size: var(--text-body);
 }
 
 @keyframes popIn {
@@ -598,22 +482,35 @@
   top: 38%;
 }
 
+.finale-copy .story-title,
+.finale-copy h1 {
+  font-size: clamp(2rem, 6.5vw, 3.2rem);
+}
+
 @media (max-width: 640px) {
-  .cake-controls {
-    bottom: 5rem;
-  }
-
   .wall-menu {
-    bottom: 5.1rem;
     gap: 0.4rem;
-  }
-
-  .wall-btn {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
   }
 
   .poem-panel {
     padding: 1.1rem 1rem 1.3rem;
+  }
+
+  .wall-preview {
+    width: min(90vw, 20rem);
+    top: 44%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .countdown-num,
+  .caret,
+  .letter-foot {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .heart-scatter-petal {
+    will-change: auto;
   }
 }

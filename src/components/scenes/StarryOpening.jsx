@@ -1,81 +1,65 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { OPENING_LINES } from '../../data/content'
-import Sparkles from '../Sparkles'
+import { MOTION, prefersReducedMotion } from '../../styles/motion'
+import StoryBackground from '../story/StoryBackground'
 import './scenes.css'
 
 export default function StarryOpening({ onReady }) {
   const rootRef = useRef(null)
   const lineRef = useRef(null)
   const onReadyRef = useRef(onReady)
-  onReadyRef.current = onReady
 
   useEffect(() => {
+    onReadyRef.current = onReady
+  }, [onReady])
+
+  useEffect(() => {
+    const reduced = prefersReducedMotion()
+
     const ctx = gsap.context(() => {
-      const stars = gsap.utils.toArray('.star-dot')
-      gsap.fromTo(
-        stars,
-        { opacity: 0, scale: 0.2 },
-        {
-          opacity: () => gsap.utils.random(0.25, 1),
-          scale: 1,
-          duration: 1.4,
-          stagger: { each: 0.02, from: 'random' },
-          ease: 'power2.out',
-        },
-      )
+      if (reduced) {
+        if (lineRef.current) {
+          lineRef.current.textContent = OPENING_LINES[OPENING_LINES.length - 1]
+        }
+        onReadyRef.current?.()
+        return
+      }
 
       const tl = gsap.timeline({
-        delay: 0.6,
+        delay: 0.45,
         onComplete: () => onReadyRef.current?.(),
       })
 
       OPENING_LINES.forEach((line) => {
         tl.to(lineRef.current, {
           opacity: 0,
-          y: -12,
-          duration: 0.35,
-          ease: 'power1.in',
+          y: -MOTION.yShift,
+          duration: MOTION.fadeOut,
+          ease: MOTION.easeIn,
         })
-          .set(lineRef.current, { textContent: line, y: 16 })
+          .set(lineRef.current, { textContent: line, y: MOTION.yShift })
           .to(lineRef.current, {
             opacity: 1,
             y: 0,
-            duration: 0.55,
-            ease: 'power2.out',
+            duration: MOTION.fadeIn,
+            ease: MOTION.easeOut,
           })
-          .to({}, { duration: 1.15 })
+          .to({}, { duration: MOTION.hold })
       })
     }, rootRef)
 
     return () => ctx.revert()
   }, [])
 
-  const starNodes = Array.from({ length: 80 }, (_, i) => (
-    <span
-      key={i}
-      className="star-dot"
-      style={{
-        left: `${(i * 17) % 100}%`,
-        top: `${(i * 29) % 100}%`,
-        animationDelay: `${(i % 9) * 0.2}s`,
-        width: `${1 + (i % 3)}px`,
-        height: `${1 + (i % 3)}px`,
-      }}
-    />
-  ))
-
   return (
     <section ref={rootRef} className="scene stars-scene">
-      <div className="night-sky" />
-      <div className="star-field">{starNodes}</div>
-      <Sparkles />
-      <div className="scene-copy stars-copy">
+      <StoryBackground variant="blush" stars sparkles moon />
+      <div className="story-copy scene-copy stars-copy">
         <p ref={lineRef} className="type-line">
           …
         </p>
       </div>
-      <div className="moon" aria-hidden />
     </section>
   )
 }

@@ -3,7 +3,11 @@ import gsap from 'gsap'
 import * as THREE from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-import { NICKNAME, WALL_PHOTOS } from '../../data/content'
+import { WALL_PHOTOS } from '../../data/content'
+import { prefersReducedMotion } from '../../styles/motion'
+import PrimaryButton from '../story/PrimaryButton'
+import StoryBackground from '../story/StoryBackground'
+import StoryCopy from '../story/StoryCopy'
 import './scenes.css'
 
 const LAYOUTS = [
@@ -73,6 +77,7 @@ export default function AlbumScene() {
     const mount = mountRef.current
     if (!mount) return undefined
 
+    const reduced = prefersReducedMotion()
     const width = mount.clientWidth
     const height = mount.clientHeight
 
@@ -118,20 +123,21 @@ export default function AlbumScene() {
 
     const transformTo = (key, duration = 1600) => {
       const list = targets[key]
+      const dur = reduced ? 0.35 : (duration + Math.random() * duration) / 1000
       objects.forEach((object, i) => {
         const target = list[i]
         gsap.to(object.position, {
           x: target.position.x,
           y: target.position.y,
           z: target.position.z,
-          duration: (duration + Math.random() * duration) / 1000,
+          duration: dur,
           ease: 'expo.inOut',
         })
         gsap.to(object.rotation, {
           x: target.rotation.x,
           y: target.rotation.y,
           z: target.rotation.z,
-          duration: (duration + Math.random() * duration) / 1000,
+          duration: dur,
           ease: 'expo.inOut',
         })
       })
@@ -140,12 +146,12 @@ export default function AlbumScene() {
     let frame = 0
     const tick = () => {
       frame = requestAnimationFrame(tick)
-      scene.rotation.y += 0.004
+      if (!reduced) scene.rotation.y += 0.004
       controls.update()
       renderer.render(scene, camera)
     }
     tick()
-    transformTo('table', 1800)
+    transformTo('table', reduced ? 400 : 1800)
 
     const onResize = () => {
       const w = mount.clientWidth
@@ -156,19 +162,21 @@ export default function AlbumScene() {
     }
     window.addEventListener('resize', onResize)
 
-    const cycle = window.setInterval(() => {
-      setLayout((prev) => {
-        const idx = LAYOUTS.findIndex((l) => l.id === prev)
-        const next = LAYOUTS[(idx + 1) % LAYOUTS.length].id
-        transformTo(next, 1400)
-        return next
-      })
-    }, 9000)
+    const cycle = reduced
+      ? null
+      : window.setInterval(() => {
+          setLayout((prev) => {
+            const idx = LAYOUTS.findIndex((l) => l.id === prev)
+            const next = LAYOUTS[(idx + 1) % LAYOUTS.length].id
+            transformTo(next, 1400)
+            return next
+          })
+        }, 9000)
 
     apiRef.current = { transformTo }
 
     return () => {
-      window.clearInterval(cycle)
+      if (cycle) window.clearInterval(cycle)
       window.removeEventListener('resize', onResize)
       cancelAnimationFrame(frame)
       controls.dispose()
@@ -185,27 +193,26 @@ export default function AlbumScene() {
 
   const switchLayout = (id) => {
     setLayout(id)
-    apiRef.current?.transformTo(id, 1500)
+    apiRef.current?.transformTo(id, prefersReducedMotion() ? 400 : 1500)
   }
 
   return (
     <section className="scene album-scene album-wall-scene">
-      <div className="scene-copy wall-copy">
-        <h2>回忆照片墙</h2>
-      </div>
+      <StoryBackground variant="soft" />
+      <StoryCopy title="回忆照片墙" className="wall-copy" />
 
       <div ref={mountRef} className="wall-stage" />
 
       <div className="wall-menu">
         {LAYOUTS.map((item) => (
-          <button
+          <PrimaryButton
             key={item.id}
-            type="button"
-            className={`wall-btn${layout === item.id ? ' active' : ''}`}
+            variant="chip"
+            className={layout === item.id ? 'is-active' : ''}
             onClick={() => switchLayout(item.id)}
           >
             {item.label}
-          </button>
+          </PrimaryButton>
         ))}
       </div>
 

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useState } from 'react'
 import { SCENES } from './data/content'
 import SceneChrome from './components/SceneChrome'
+import StoryTransition from './components/StoryTransition'
 import StarryOpening from './components/scenes/StarryOpening'
 import FireworksScene from './components/scenes/FireworksScene'
 import Love003Finale from './components/scenes/Love003Finale'
@@ -19,11 +20,7 @@ const CTA_LABELS = [
 ]
 
 function SceneFallback() {
-  return (
-    <div className="fade-panel" style={{ color: '#9d174d' }}>
-      加载中…
-    </div>
-  )
+  return <div className="fade-panel">加载中…</div>
 }
 
 export default function App() {
@@ -62,23 +59,26 @@ export default function App() {
 
   const showCta = sceneIndex < SCENES.length - 1
   const chromeHidden = sceneIndex === SCENES.length - 1
+  const sceneKey = SCENES[sceneIndex]?.id ?? String(sceneIndex)
 
   return (
     <div className={`app${chromeHidden ? ' finale-mode' : ''}`}>
       <div className="scene-layer">
         <Suspense fallback={<SceneFallback />}>
-          {sceneIndex === 0 && <StarryOpening onReady={handleOpeningReady} />}
-          {sceneIndex === 1 && (
-            <HeartScene
-              onReady={handleHeartReady}
-              opening={heartOpening}
-              onOpened={handleHeartOpened}
-            />
-          )}
-          {sceneIndex === 2 && <AlbumScene />}
-          {sceneIndex === 3 && <CakeScene onExtinguished={handleCakeDone} />}
-          {sceneIndex === 4 && <FireworksScene />}
-          {sceneIndex === 5 && <Love003Finale />}
+          <StoryTransition sceneKey={sceneKey}>
+            {sceneIndex === 0 && <StarryOpening onReady={handleOpeningReady} />}
+            {sceneIndex === 1 && (
+              <HeartScene
+                onReady={handleHeartReady}
+                opening={heartOpening}
+                onOpened={handleHeartOpened}
+              />
+            )}
+            {sceneIndex === 2 && <AlbumScene />}
+            {sceneIndex === 3 && <CakeScene onExtinguished={handleCakeDone} />}
+            {sceneIndex === 4 && <FireworksScene />}
+            {sceneIndex === 5 && <Love003Finale />}
+          </StoryTransition>
         </Suspense>
       </div>
 

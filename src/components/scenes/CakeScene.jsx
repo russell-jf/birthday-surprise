@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float } from '@react-three/drei'
 import { useBlowDetection } from '../../hooks/useBlowDetection'
+import PrimaryButton from '../story/PrimaryButton'
+import StoryBackground from '../story/StoryBackground'
+import StoryCopy from '../story/StoryCopy'
 import './scenes.css'
 
 function Flame({ lit, position }) {
@@ -99,27 +102,25 @@ export default function CakeScene({ onExtinguished }) {
     onExtinguished?.()
   }
 
+  const subtitle = lit
+    ? ready
+      ? '对着麦克风轻轻吹一口气，熄灭蜡烛～'
+      : '麦克风不可用也可以点按钮吹灭哦'
+    : '愿望已收下，蜡烛熄灭啦！'
+
   return (
     <section className="scene cake-scene">
-      <div className="scene-copy">
-        <h2>许个愿吧</h2>
-        <p>
-          {lit
-            ? ready
-              ? '对着麦克风轻轻吹一口气，熄灭蜡烛～'
-              : '麦克风不可用也可以点按钮吹灭哦'
-            : '愿望已收下，蜡烛熄灭啦！'}
-        </p>
-      </div>
+      <StoryBackground variant="blush" />
+      <StoryCopy title="许个愿吧" subtitle={subtitle} />
 
       <div className="r3f-stage cake-stage">
         <Canvas camera={{ position: [0, 1.2, 3.4], fov: 42 }} dpr={[1, 1.75]}>
           <color attach="background" args={['#ffc0cb']} />
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[2, 4, 3]} intensity={1.1} color="#ffffff" />
+          <ambientLight intensity={0.85} />
+          <directionalLight position={[2, 4, 3]} intensity={1.15} color="#ffffff" />
           <pointLight
             position={[0, 1.5, 0.5]}
-            intensity={lit ? 1.35 : 0.35}
+            intensity={lit ? 1.4 : 0.35}
             color="#ffb347"
           />
           <BirthdayCake lit={lit} />
@@ -130,12 +131,12 @@ export default function CakeScene({ onExtinguished }) {
         <div className="mic-meter" aria-hidden>
           <div className="mic-meter-fill" style={{ width: `${Math.min(level * 220, 100)}%` }} />
         </div>
-        {error ? <p className="mic-hint">未授权麦克风 · 可用下方按钮</p> : null}
-        {blowing && lit ? <p className="mic-hint hot">检测到吹气…</p> : null}
+        {lit && error ? <p className="mic-hint">未授权麦克风 · 可用下方按钮</p> : null}
+        {lit && blowing ? <p className="mic-hint hot">检测到吹气…</p> : null}
         {lit ? (
-          <button type="button" className="cta ghost" onClick={extinguishManually}>
+          <PrimaryButton variant="ghost" onClick={extinguishManually}>
             轻轻吹灭蜡烛
-          </button>
+          </PrimaryButton>
         ) : null}
       </div>
     </section>
