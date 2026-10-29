@@ -105,7 +105,7 @@ export default function StarryOpening({ onReady }) {
         <p ref={lineRef} className="type-line type-line--stack">
           …
         </p>
-        <p className="stars-skip-hint">点击任意处显示全文</p>
+        <p className="stars-skip-hint"></p>
       </div>
     </section>
   )

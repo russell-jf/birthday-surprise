@@ -77,12 +77,19 @@ function BirthdayCake({ lit }) {
   )
 }
 
+function statusCopy(status, lit) {
+  if (!lit || status === 'done') return '愿望已收下，蜡烛熄灭啦！'
+  if (status === 'blowing') return '检测到吹气，再坚持一下…'
+  if (status === 'listening') return '正在听，对着麦克风轻轻吹一口气～'
+  if (status === 'denied') return '未授权麦克风 · 可用下方按钮吹灭'
+  return '点「用麦克风吹蜡烛」开启权限，或直接手动吹灭'
+}
+
 export default function CakeScene({ onExtinguished }) {
   const [lit, setLit] = useState(true)
   const blownRef = useRef(false)
-  const { ready, blowing, error, level, setOnBlow } = useBlowDetection({
+  const { status, startListening, setOnBlow, setMeterEl } = useBlowDetection({
     enabled: lit,
-    threshold: 0.12,
     holdMs: 380,
   })
 
@@ -102,16 +109,14 @@ export default function CakeScene({ onExtinguished }) {
     onExtinguished?.()
   }
 
-  const subtitle = lit
-    ? ready
-      ? '对着麦克风轻轻吹一口气，熄灭蜡烛～'
-      : '麦克风不可用也可以点按钮吹灭哦'
-    : '愿望已收下，蜡烛熄灭啦！'
+  // Denied: keep manual only — do not re-prompt getUserMedia.
+  const showMicButton = lit && status === 'idle'
+  const showMeter = lit && (status === 'listening' || status === 'blowing')
 
   return (
     <section className="scene cake-scene">
       <StoryBackground variant="blush" />
-      <StoryCopy title="许个愿吧" subtitle={subtitle} />
+      <StoryCopy title="许个愿吧" subtitle={statusCopy(status, lit)} />
 
       <div className="r3f-stage cake-stage">
         <Canvas camera={{ position: [0, 1.2, 3.4], fov: 42 }} dpr={[1, 1.75]}>
@@ -128,11 +133,21 @@ export default function CakeScene({ onExtinguished }) {
       </div>
 
       <div className="cake-controls">
-        <div className="mic-meter" aria-hidden>
-          <div className="mic-meter-fill" style={{ width: `${Math.min(level * 220, 100)}%` }} />
-        </div>
-        {lit && error ? <p className="mic-hint">未授权麦克风 · 可用下方按钮</p> : null}
-        {lit && blowing ? <p className="mic-hint hot">检测到吹气…</p> : null}
+        {showMeter ? (
+          <div className="mic-meter" aria-hidden>
+            <div className="mic-meter-fill" ref={setMeterEl} />
+          </div>
+        ) : null}
+
+        {lit && status === 'denied' ? (
+          <p className="mic-hint">未授权麦克风 · 可用下方按钮</p>
+        ) : null}
+        {lit && status === 'blowing' ? <p className="mic-hint hot">检测到吹气…</p> : null}
+
+        {showMicButton ? (
+          <PrimaryButton onClick={() => startListening()}>用麦克风吹蜡烛</PrimaryButton>
+        ) : null}
+
         {lit ? (
           <PrimaryButton variant="ghost" onClick={extinguishManually}>
             轻轻吹灭蜡烛
