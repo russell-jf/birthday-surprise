@@ -1,5 +1,6 @@
 /* Based on Awesome-Love-Code Web/003 (MIT) — adapted for fullscreen embed */
 /* Fonts aligned with the React storybook: display / body / ui */
+/* Text layer is document-flow (readable on mobile); only the tree canvas is scaled. */
 
 :root {
 	--font-display: 'Cormorant Garamond', 'Times New Roman', serif;
@@ -10,6 +11,7 @@
 	--ink-strong: #b3122b;
 	--ink-title: #9d174d;
 	--love-pink: #ffc0cb;
+	--letter-pad-x: max(20px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
 }
 
 body {
@@ -30,17 +32,27 @@ body {
 
 a {
 	color: var(--ink-strong);
-	font-size: 14px;
+	font-size: inherit;
 	font-family: inherit;
 	text-decoration: none;
 }
 
 #main {
+	position: relative;
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
+}
+
+/* Tree canvas: logical 1100×680, fitted to viewport (does not scale text) */
+#stage {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	pointer-events: none;
 }
 
 #wrap {
@@ -48,45 +60,90 @@ a {
 	width: 1100px;
 	height: 680px;
 	transform-origin: center center;
+	pointer-events: auto;
+	flex-shrink: 0;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	background-position: center;
+}
+
+#canvas {
+	margin: 0;
+	width: 1100px;
+	height: 680px;
+	display: block;
+}
+
+/* Letter: normal document flow, independent of wrap scale */
+#letter-panel {
+	position: absolute;
+	z-index: 2;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: min(100%, 34rem);
+	max-width: 34rem;
+	box-sizing: border-box;
+	padding:
+		max(3.6rem, calc(env(safe-area-inset-top, 0px) + 2.8rem))
+		var(--letter-pad-x)
+		calc(5.5rem + env(safe-area-inset-bottom, 0px))
+		var(--letter-pad-x);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.45s ease;
+}
+
+#letter-panel.active {
+	opacity: 1;
+	pointer-events: auto;
 }
 
 #text {
-	width: 400px;
-	height: 480px;
-	left: 60px;
-	top: 64px;
-	position: absolute;
-	z-index: 2;
+	position: relative;
+	width: 100%;
+	max-width: 34rem;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
 }
 
 #code {
 	display: none;
-	font-size: 15px;
-	line-height: 1.55;
+	font-size: clamp(15px, 4.2vw, 18px);
+	line-height: 1.9;
 	letter-spacing: 0.04em;
 	font-weight: 400;
+	color: var(--ink);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 #clock-box {
-	position: absolute;
-	left: 60px;
-	top: 556px;
-	font-size: 22px;
-	line-height: 1.4;
+	position: relative;
+	flex: 0 0 auto;
+	margin-top: 1rem;
+	font-size: clamp(14px, 3.6vw, 17px);
+	line-height: 1.5;
 	letter-spacing: 0.04em;
 	display: none;
-	z-index: 2;
-	white-space: nowrap;
+	white-space: normal;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 #clock-box a {
-	font-size: 22px;
-	font-weight: 400;
+	font-size: inherit;
+	font-weight: 500;
 }
 
 #clock {
-	margin-left: 40px;
-	margin-top: 4px;
+	margin-left: 0;
+	margin-top: 0.35rem;
 	font-family: var(--font-ui);
 	font-variant-numeric: tabular-nums;
 	font-feature-settings: "tnum" 1;
@@ -94,25 +151,21 @@ a {
 
 #clock .digit {
 	font-family: var(--font-ui);
-	font-size: 46px;
+	font-size: clamp(1.35rem, 5.5vw, 2rem);
 	font-weight: 500;
-	line-height: 1.1;
+	line-height: 1.15;
 	letter-spacing: 0.02em;
 	color: var(--ink-strong);
 }
 
-#canvas {
-	margin: 0 auto;
-	width: 1100px;
-	height: 680px;
-	display: block;
-}
-
 #error {
+	position: relative;
+	z-index: 3;
 	margin: 0 auto;
 	text-align: center;
 	margin-top: 60px;
 	display: none;
+	padding: 0 1.25rem;
 }
 
 .hand {
@@ -120,11 +173,12 @@ a {
 }
 
 .say {
-	margin-left: 5px;
+	margin-left: 0.15em;
 }
 
 .space {
-	margin-right: 150px;
+	display: inline-block;
+	width: 2em;
 }
 
 #hint {
@@ -138,22 +192,24 @@ a {
 	background: rgba(255, 255, 255, 0.62);
 	border: 1px solid rgba(190, 26, 37, 0.22);
 	font-family: var(--font-body);
-	font-size: 15px;
+	font-size: clamp(13px, 3.5vw, 15px);
 	letter-spacing: 0.06em;
 	color: var(--ink-title);
 	pointer-events: none;
+	max-width: calc(100vw - 2.5rem);
+	text-align: center;
+	box-sizing: border-box;
 }
 
-/* 动画结束后居中浮现；字号按 1100×680 画布坐标系，经 wrap scale 缩放 */
 #happy-birthday {
 	position: absolute;
 	left: 50%;
-	top: 20%;
+	top: 12%;
 	z-index: 6;
 	margin: 0;
 	padding: 0 0.15em;
 	font-family: var(--font-display);
-	font-size: 72px;
+	font-size: clamp(1.75rem, 8vw, 4.5rem);
 	font-weight: 500;
 	font-style: italic;
 	line-height: 1.1;
@@ -186,9 +242,26 @@ a {
 	}
 }
 
-@media (max-width: 720px) {
+@media (min-width: 900px) {
+	#letter-panel {
+		width: min(42%, 34rem);
+		padding-top: max(2.5rem, env(safe-area-inset-top, 0px));
+		padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#letter-panel {
+		transition: none;
+	}
+
 	#happy-birthday {
-		font-size: 40px;
-		letter-spacing: 0.04em;
+		transition: none;
+	}
+
+	#happy-birthday.show {
+		animation: none;
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
 	}
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { NICKNAME } from '../../data/content'
+import { useStoryConfig } from '../../context/StoryConfig'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { MOTION, prefersReducedMotion } from '../../styles/motion'
 import StoryBackground from '../story/StoryBackground'
@@ -35,6 +35,7 @@ function spawnBurst(layer, x, y, reduced) {
 }
 
 export default function FireworksScene() {
+  const { config } = useStoryConfig()
   const [count, setCount] = useState(COUNT_FROM)
   const [celebrating, setCelebrating] = useState(false)
   const layerRef = useRef(null)
@@ -101,7 +102,7 @@ export default function FireworksScene() {
       ) : (
         <StoryCopy className="finale-copy" titleAs="h1">
           <h1 ref={titleRef} className="story-title">
-            生日快乐，{NICKNAME}！
+            生日快乐，{config.nickname}！
           </h1>
           <p className="story-body">愿你被爱包围，像今晚的烟花一样闪亮。</p>
         </StoryCopy>

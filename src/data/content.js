@@ -1,61 +1,89 @@
-export const NICKNAME = '宝宝'
+import {
+  DEFAULT_BIRTH_DATE,
+  DEFAULT_CTA_LABELS,
+  DEFAULT_LETTER_LINES,
+  DEFAULT_MEMORIES,
+  DEFAULT_NICKNAME,
+  DEFAULT_OPENING_LINES,
+  DEFAULT_SCENES,
+  DEFAULT_TOGETHER,
+} from './defaults'
 
-export const BIRTH_DATE = 'NOVEMBER 26, 2026'
+/** @typedef {{ nickname: string, birthDate: string, openingLines: string[], ctaLabels: string[], letterLines: string[], together: { year: number, month: number, day: number }, memories: { src: string, title: string, caption: string }[] }} StoryConfig */
 
-export const SCENES = [
-  { id: 'stars', label: '星空' },
-  { id: 'heart', label: '玫瑰' },
-  { id: 'album', label: '相册' },
-  { id: 'cake', label: '蛋糕' },
-  { id: 'finale', label: '烟花' },
-  { id: 'letter', label: '情书' },
-]
+/** @type {StoryConfig} */
+let runtimeConfig = {
+  nickname: DEFAULT_NICKNAME,
+  birthDate: DEFAULT_BIRTH_DATE,
+  openingLines: [...DEFAULT_OPENING_LINES],
+  ctaLabels: [...DEFAULT_CTA_LABELS],
+  letterLines: [...DEFAULT_LETTER_LINES],
+  together: { ...DEFAULT_TOGETHER },
+  memories: DEFAULT_MEMORIES.map((m) => ({ ...m })),
+}
 
-export const OPENING_LINES = [
-  `嗨，${NICKNAME}…`,
-  '今晚的粉色天空，好像都是为你准备的。',
-  '闭上眼，许一个小小的愿望吧。',
-  '然后——跟我走。',
-]
+export const SCENES = DEFAULT_SCENES
 
-const asset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
+export function getConfig() {
+  return runtimeConfig
+}
 
-/** 基础回忆图，会在照片墙中循环铺满 */
-export const MEMORIES = [
-  {
-    src: asset('image/1.jpg'),
-    title: '青岛回忆',
-    caption: '那天阳光刚好，世界忽然变得柔软。',
-  },
-  {
-    src: asset('image/2.jpg'),
-    title: '一起走过的琴屿路',
-    caption: '手牵手也好，肩并肩也好，都是我最喜欢的风景。',
-  },
-  {
-    src: asset('image/3.jpg'),
-    title: '偷笑的瞬间',
-    caption: '你笑起来的时候，连空气都甜了一点。',
-  },
-  {
-    src: asset('image/4.jpg'),
-    title: '三周年',
-    caption: '我们说好，要把平凡日子过成童话。',
-  },
-  {
-    src: asset('image/5.jpg'),
-    title: '今天也爱你',
-    caption: '生日快乐，我的公主。',
-  },
-]
+export function setConfig(next) {
+  runtimeConfig = {
+    nickname: next.nickname || DEFAULT_NICKNAME,
+    birthDate: next.birthDate || DEFAULT_BIRTH_DATE,
+    openingLines: next.openingLines?.length ? [...next.openingLines] : [...DEFAULT_OPENING_LINES],
+    ctaLabels: next.ctaLabels?.length === 5 ? [...next.ctaLabels] : [...DEFAULT_CTA_LABELS],
+    letterLines: next.letterLines?.length ? [...next.letterLines] : [...DEFAULT_LETTER_LINES],
+    together: next.together
+      ? {
+          year: next.together.year,
+          month: next.together.month,
+          day: next.together.day,
+        }
+      : { ...DEFAULT_TOGETHER },
+    memories: (next.memories?.length ? next.memories : DEFAULT_MEMORIES).map((m) => ({
+      src: m.src,
+      title: m.title,
+      caption: m.caption,
+    })),
+  }
+  return runtimeConfig
+}
+
+export const NICKNAME = DEFAULT_NICKNAME
+export const BIRTH_DATE = DEFAULT_BIRTH_DATE
+export const OPENING_LINES = DEFAULT_OPENING_LINES
+export const MEMORIES = DEFAULT_MEMORIES
 
 export const WALL_PHOTO_COUNT = 40
 
-export const WALL_PHOTOS = Array.from({ length: WALL_PHOTO_COUNT }, (_, i) => {
-  const base = MEMORIES[i % MEMORIES.length]
-  return {
-    ...base,
-    id: `wall-${i}`,
-    label: `${base.title} · ${i + 1}`,
+export function buildWallPhotos(memories = getConfig().memories) {
+  const list = memories.length ? memories : DEFAULT_MEMORIES
+  return Array.from({ length: WALL_PHOTO_COUNT }, (_, i) => {
+    const base = list[i % list.length]
+    return {
+      ...base,
+      id: `wall-${i}`,
+      label: `${base.title} · ${i + 1}`,
+    }
+  })
+}
+
+export const WALL_PHOTOS = buildWallPhotos()
+
+export function shareTokenFromLocation(search = window.location.search) {
+  const params = new URLSearchParams(search)
+  const token = params.get('s') || ''
+  return /^[a-f0-9]{32}$/.test(token) ? token : ''
+}
+
+export async function loadRemoteConfig(token) {
+  const res = await fetch(`/api/public/surprises/${token}`, { credentials: 'omit' })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || '无法加载这份生日惊喜')
   }
-})
+  const data = await res.json()
+  return setConfig(data)
+}

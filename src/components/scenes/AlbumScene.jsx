@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
-import { WALL_PHOTOS } from '../../data/content'
+import { buildWallPhotos } from '../../data/content'
+import { useStoryConfig } from '../../context/StoryConfig'
 import { prefersReducedMotion } from '../../styles/motion'
 import PrimaryButton from '../story/PrimaryButton'
 import StoryBackground from '../story/StoryBackground'
@@ -68,10 +69,12 @@ function buildTargets(count) {
 }
 
 export default function AlbumScene() {
+  const { config } = useStoryConfig()
   const mountRef = useRef(null)
   const apiRef = useRef(null)
   const [layout, setLayout] = useState('table')
   const [preview, setPreview] = useState(null)
+  const wallPhotos = useMemo(() => buildWallPhotos(config.memories), [config.memories])
 
   useEffect(() => {
     const mount = mountRef.current
@@ -98,9 +101,9 @@ export default function AlbumScene() {
     controls.noPan = true
 
     const objects = []
-    const targets = buildTargets(WALL_PHOTOS.length)
+    const targets = buildTargets(wallPhotos.length)
 
-    WALL_PHOTOS.forEach((photo, i) => {
+    wallPhotos.forEach((photo, i) => {
       const el = document.createElement('button')
       el.type = 'button'
       el.className = 'wall-card'
@@ -189,7 +192,7 @@ export default function AlbumScene() {
       renderer.domElement.remove()
       apiRef.current = null
     }
-  }, [])
+  }, [wallPhotos])
 
   const switchLayout = (id) => {
     setLayout(id)

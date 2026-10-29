@@ -37,6 +37,28 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
+.stars-copy .type-line--stack {
+  white-space: pre-line;
+  min-height: 0;
+}
+
+.stars-skip-hint {
+  margin: 1.1rem 0 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: var(--weight-ui);
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  opacity: 0.7;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars-skip-hint {
+    opacity: 0.85;
+  }
+}
+
 /* Heart / rose */
 .heart-scene {
   transform-origin: 50% 50%;

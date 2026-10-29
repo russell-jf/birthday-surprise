@@ -1,38 +1,91 @@
-import { Suspense, lazy, useCallback, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { SCENES } from './data/content'
+import { StoryConfigProvider, useStoryConfig } from './context/StoryConfig'
 import SceneChrome from './components/SceneChrome'
 import StoryTransition from './components/StoryTransition'
 import StarryOpening from './components/scenes/StarryOpening'
 import FireworksScene from './components/scenes/FireworksScene'
 import Love003Finale from './components/scenes/Love003Finale'
+import { ensureSceneHash, hashForScene, sceneIndexFromHash } from './utils/sceneHash'
 
 const HeartScene = lazy(() => import('./components/scenes/HeartScene'))
 const AlbumScene = lazy(() => import('./components/scenes/AlbumScene'))
 const CakeScene = lazy(() => import('./components/scenes/CakeScene'))
 
-const CTA_LABELS = [
-  '进入惊喜',
-  '开启我们的故事',
-  '去吹蜡烛',
-  '倒数烟花',
-  '打开情书',
-  null,
-]
-
 function SceneFallback() {
   return <div className="fade-panel">加载中…</div>
 }
 
-export default function App() {
-  const [sceneIndex, setSceneIndex] = useState(0)
+function clampScene(index) {
+  return Math.max(0, Math.min(index, SCENES.length - 1))
+}
+
+function StoryApp() {
+  const { ready, error, config } = useStoryConfig()
+  const [sceneIndex, setSceneIndex] = useState(() =>
+    typeof window !== 'undefined' ? sceneIndexFromHash() : 0,
+  )
   const [openingReady, setOpeningReady] = useState(false)
   const [heartReady, setHeartReady] = useState(false)
   const [heartOpening, setHeartOpening] = useState(false)
   const [cakeDone, setCakeDone] = useState(false)
+  const titleRef = useRef(null)
+  const sceneIndexRef = useRef(sceneIndex)
+  const ctaRef = useRef({ disabled: true, handleCta: () => {} })
+
+  useEffect(() => {
+    sceneIndexRef.current = sceneIndex
+  }, [sceneIndex])
+
+  const resetGatesFor = useCallback((index) => {
+    // Re-enter gated scenes with a fresh lock; later scenes stay unlocked.
+    setOpeningReady(false)
+    setHeartReady(false)
+    setHeartOpening(false)
+    setCakeDone(false)
+    if (index > 0) setOpeningReady(true)
+    if (index > 1) setHeartReady(true)
+    if (index > 3) setCakeDone(true)
+  }, [])
+
+  const goTo = useCallback(
+    (index) => {
+      const next = clampScene(index)
+      const hash = hashForScene(next)
+      if (window.location.hash === hash) {
+        resetGatesFor(next)
+        setSceneIndex(next)
+        return
+      }
+      window.location.hash = hash
+    },
+    [resetGatesFor],
+  )
 
   const goNext = useCallback(() => {
-    setSceneIndex((i) => Math.min(i + 1, SCENES.length - 1))
-  }, [])
+    goTo(sceneIndexRef.current + 1)
+  }, [goTo])
+
+  const goPrev = useCallback(() => {
+    goTo(sceneIndexRef.current - 1)
+  }, [goTo])
+
+  useEffect(() => {
+    ensureSceneHash(sceneIndexFromHash())
+
+    const onHashChange = () => {
+      const next = sceneIndexFromHash()
+      resetGatesFor(next)
+      setSceneIndex(next)
+    }
+
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [resetGatesFor])
+
+  useEffect(() => {
+    titleRef.current?.focus({ preventScroll: true })
+  }, [sceneIndex])
 
   const handleOpeningReady = useCallback(() => setOpeningReady(true), [])
   const handleHeartReady = useCallback(() => setHeartReady(true), [])
@@ -44,25 +97,75 @@ export default function App() {
   const handleCakeDone = useCallback(() => setCakeDone(true), [])
 
   const handleCta = useCallback(() => {
-    if (sceneIndex === 1) {
+    if (sceneIndexRef.current === 1) {
       if (heartOpening) return
       setHeartOpening(true)
       return
     }
     goNext()
-  }, [sceneIndex, heartOpening, goNext])
+  }, [heartOpening, goNext])
 
   const ctaDisabled =
     (sceneIndex === 0 && !openingReady) ||
     (sceneIndex === 1 && (!heartReady || heartOpening)) ||
     (sceneIndex === 3 && !cakeDone)
 
+  useEffect(() => {
+    ctaRef.current = { disabled: ctaDisabled, handleCta }
+  }, [ctaDisabled, handleCta])
+
+  useEffect(() => {
+    const isTypingTarget = (el) => {
+      if (!el || !(el instanceof Element)) return false
+      const tag = el.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable
+    }
+
+    const onKeyDown = (e) => {
+      if (isTypingTarget(e.target)) return
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        goNext()
+        return
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        goPrev()
+        return
+      }
+      if (e.key === 'Enter') {
+        const tag = e.target instanceof Element ? e.target.tagName : ''
+        if (tag === 'BUTTON' || tag === 'A') return
+        if (ctaRef.current.disabled) return
+        if (sceneIndexRef.current >= SCENES.length - 1) return
+        e.preventDefault()
+        ctaRef.current.handleCta()
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [goNext, goPrev])
+
+  if (!ready) {
+    return <div className="fade-panel">加载惊喜中…</div>
+  }
+
+  if (error) {
+    return <div className="fade-panel">{error}</div>
+  }
+
   const showCta = sceneIndex < SCENES.length - 1
-  const chromeHidden = sceneIndex === SCENES.length - 1
   const sceneKey = SCENES[sceneIndex]?.id ?? String(sceneIndex)
+  const ctaLabel = config.ctaLabels[sceneIndex] ?? '继续'
+  const sceneLabel = SCENES[sceneIndex]?.label ?? ''
 
   return (
-    <div className={`app${chromeHidden ? ' finale-mode' : ''}`}>
+    <div className="app">
+      <h2 ref={titleRef} className="scene-live-title" tabIndex={-1}>
+        {sceneLabel}
+      </h2>
+
       <div className="scene-layer">
         <Suspense fallback={<SceneFallback />}>
           <StoryTransition sceneKey={sceneKey}>
@@ -82,15 +185,22 @@ export default function App() {
         </Suspense>
       </div>
 
-      {!chromeHidden ? (
-        <SceneChrome
-          sceneIndex={sceneIndex}
-          showCta={showCta}
-          ctaLabel={CTA_LABELS[sceneIndex] ?? '继续'}
-          onCta={handleCta}
-          ctaDisabled={ctaDisabled}
-        />
-      ) : null}
+      <SceneChrome
+        sceneIndex={sceneIndex}
+        showCta={showCta}
+        ctaLabel={ctaLabel}
+        onCta={handleCta}
+        ctaDisabled={ctaDisabled}
+        onGoTo={goTo}
+      />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <StoryConfigProvider>
+      <StoryApp />
+    </StoryConfigProvider>
   )
 }

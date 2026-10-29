@@ -134,9 +134,16 @@ img {
   will-change: opacity, transform;
 }
 
-.app.finale-mode .hud,
-.app.finale-mode .scene-footer {
-  display: none;
+.scene-live-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── Chrome: date (UI) + progress + page ───────────────────────────── */
@@ -184,11 +191,30 @@ img {
 
 .progress {
   display: flex;
-  gap: 0.4rem;
-  pointer-events: none;
+  align-items: center;
+  gap: 0;
+  pointer-events: auto;
 }
 
 .progress-dot {
+  position: relative;
+  box-sizing: border-box;
+  width: 1.75rem;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-dot::after {
+  content: '';
   width: 0.48rem;
   height: 0.48rem;
   border-radius: 999px;
@@ -196,13 +222,22 @@ img {
   transition: transform var(--dur-mid) var(--ease-soft), background var(--dur-mid) var(--ease-soft);
 }
 
-.progress-dot.active {
+.progress-dot.active::after {
   background: var(--rose-500);
   transform: scale(1.3);
 }
 
-.progress-dot.done {
+.progress-dot.done::after {
   background: var(--rose-300);
+}
+
+.progress-dot:focus {
+  outline: none;
+}
+
+.progress-dot:focus-visible {
+  outline: 2px solid var(--rose-500);
+  outline-offset: 2px;
 }
 
 .scene-footer {
@@ -258,6 +293,17 @@ img {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.story-btn:focus,
+.cta:focus {
+  outline: none;
+}
+
+.story-btn:focus-visible,
+.cta:focus-visible {
+  outline: 2px solid var(--rose-500);
+  outline-offset: 3px;
 }
 
 .story-btn--ghost,
