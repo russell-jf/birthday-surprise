@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useStoryConfig } from '../../context/StoryConfig'
+import { getLove003Html } from '../../utils/preloadLove003'
 import StoryBackground from '../story/StoryBackground'
 import StoryLoader from '../StoryLoader'
 import './scenes.css'
@@ -41,12 +42,12 @@ export default function Love003Finale() {
 
     ;(async () => {
       try {
-        const base = `${import.meta.env.BASE_URL}love003/index.html`
-        const res = await fetch(base)
-        if (!res.ok) throw new Error('fetch failed')
-        let html = await res.text()
+        let html = await getLove003Html()
         const letter = buildLetterHtml(config.letterLines)
-        html = html.replace(/<div id="code">[\s\S]*?<\/div>/, `<div id="code">\n${letter}\n                </div>`)
+        html = html.replace(
+          /<div id="code">[\s\S]*?<\/div>/,
+          `<div id="code">\n${letter}\n                </div>`,
+        )
         html = html.replace(
           /together\.setFullYear\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/,
           `together.setFullYear(${config.together.year}, ${config.together.month}, ${config.together.day})`,
@@ -81,7 +82,8 @@ export default function Love003Finale() {
 
   useEffect(() => {
     if (!frameReady) return undefined
-    const id = window.setTimeout(() => setLoaderOut(true), 520)
+    /* Short settle so the seed paints before the loader fades — avoid long artificial wait. */
+    const id = window.setTimeout(() => setLoaderOut(true), 160)
     return () => window.clearTimeout(id)
   }, [frameReady])
 

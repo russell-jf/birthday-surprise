@@ -1,9 +1,10 @@
-import { SCENES } from '../data/content'
+import { getScenes } from '../data/content'
 import { useStoryConfig } from '../context/StoryConfig'
 import PrimaryButton from './story/PrimaryButton'
 
 export default function SceneChrome({
   sceneIndex,
+  scenes,
   showCta,
   ctaLabel,
   onCta,
@@ -11,8 +12,9 @@ export default function SceneChrome({
   onGoTo,
 }) {
   const { config } = useStoryConfig()
+  const sceneList = scenes?.length ? scenes : getScenes(config)
   const page = String(sceneIndex + 1).padStart(2, '0')
-  const total = String(SCENES.length).padStart(2, '0')
+  const total = String(sceneList.length).padStart(2, '0')
 
   return (
     <>
@@ -20,7 +22,7 @@ export default function SceneChrome({
         <div className="brand">{config.birthDate}</div>
         <div className="chrome-meta">
           <div className="progress" role="navigation" aria-label="进度">
-            {SCENES.map((scene, i) => {
+            {sceneList.map((scene, i) => {
               const active = i === sceneIndex
               return (
                 <button

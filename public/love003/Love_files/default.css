@@ -3,9 +3,10 @@
 /* Text layer is document-flow (readable on mobile); only the tree canvas is scaled. */
 
 :root {
-	--font-display: 'Cormorant Garamond', 'Times New Roman', serif;
-	--font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-	--font-ui: 'Outfit', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+	/* Prefer system CJK fonts inside the iframe (no Google Fonts round-trip). */
+	--font-display: 'Songti SC', 'Times New Roman', serif;
+	--font-body: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+	--font-ui: 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
 	--font-main: var(--font-body);
 	--ink: #4a1220;
 	--ink-strong: #b3122b;

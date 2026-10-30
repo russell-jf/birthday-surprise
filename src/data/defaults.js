@@ -147,4 +147,39 @@ export const DEFAULT_MEMORIES = [
     title: '今天也爱你',
     caption: '生日快乐，我的公主。',
   },
+  {
+    src: asset('image/6.webp'),
+    title: '花海许愿',
+    caption: '穿上了好看的裙子，在花海里偷偷许了个愿。',
+  },
+  {
+    src: asset('image/7.webp'),
+    title: '演唱会',
+    caption: '耳机里的浪漫，终于变成了现场的人声鼎沸',
+  },
+  {
+    src: asset('image/8.webp'),
+    title: '装满快乐的晚上',
+    caption: '在三丽鸥的包围下，今天不赶时间，只负责开心。',
+  },
+  {
+    src: asset('image/9.webp'),
+    title: '人海中的浪漫',
+    caption: '不管周围多喧嚣，我的视线永远只锁定你。',
+  },
+  {
+    src: asset('image/10.webp'),
+    title: '藏在咖啡里的时光',
+    caption: '窗外是风景，桌前是生活。',
+  },
+  {
+    src: asset('image/11.webp'),
+    title: '海风，沙滩，和你',
+    caption: '海浪会替我把这份喜欢传得很远很远。',
+  },
+  {
+    src: asset('image/12.webp'),
+    title: '夏日限定的心动',
+    caption: '今天不赶路，只负责感受这热带的风。',
+  },
 ]

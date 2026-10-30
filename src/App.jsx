@@ -1,5 +1,5 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
-import { SCENES } from './data/content'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { getScenes } from './data/content'
 import { StoryConfigProvider, useStoryConfig } from './context/StoryConfig'
 import SceneChrome from './components/SceneChrome'
 import StoryLoader from './components/StoryLoader'
@@ -8,21 +8,17 @@ import StarryOpening from './components/scenes/StarryOpening'
 import FireworksScene from './components/scenes/FireworksScene'
 import Love003Finale from './components/scenes/Love003Finale'
 import { ensureSceneHash, hashForScene, sceneIndexFromHash } from './utils/sceneHash'
+import { preloadLove003 } from './utils/preloadLove003'
 
 const HeartScene = lazy(() => import('./components/scenes/HeartScene'))
 const AlbumScene = lazy(() => import('./components/scenes/AlbumScene'))
 const CakeScene = lazy(() => import('./components/scenes/CakeScene'))
 const GiftWheelScene = lazy(() => import('./components/scenes/GiftWheelScene'))
 
-function clampScene(index) {
-  return Math.max(0, Math.min(index, SCENES.length - 1))
-}
-
 function StoryApp() {
   const { ready, error, config } = useStoryConfig()
-  const [sceneIndex, setSceneIndex] = useState(() =>
-    typeof window !== 'undefined' ? sceneIndexFromHash() : 0,
-  )
+  const scenes = useMemo(() => getScenes(config), [config])
+  const [sceneIndex, setSceneIndex] = useState(0)
   const [openingReady, setOpeningReady] = useState(false)
   const [heartReady, setHeartReady] = useState(false)
   const [heartOpening, setHeartOpening] = useState(false)
@@ -30,29 +26,43 @@ function StoryApp() {
   const [giftDone, setGiftDone] = useState(false)
   const titleRef = useRef(null)
   const sceneIndexRef = useRef(sceneIndex)
+  const scenesRef = useRef(scenes)
   const ctaRef = useRef({ disabled: true, handleCta: () => {} })
 
   useEffect(() => {
     sceneIndexRef.current = sceneIndex
   }, [sceneIndex])
 
-  const resetGatesFor = useCallback((index) => {
-    // Re-enter gated scenes with a fresh lock; later scenes stay unlocked.
+  useEffect(() => {
+    scenesRef.current = scenes
+  }, [scenes])
+
+  const clampScene = useCallback((index) => {
+    return Math.max(0, Math.min(index, scenesRef.current.length - 1))
+  }, [])
+
+  const resetGatesFor = useCallback((index, list = scenesRef.current) => {
+    const id = list[index]?.id
     setOpeningReady(false)
     setHeartReady(false)
     setHeartOpening(false)
     setCakeDone(false)
     setGiftDone(false)
-    if (index > 0) setOpeningReady(true)
-    if (index > 1) setHeartReady(true)
-    if (index > 3) setCakeDone(true)
-    if (index > 5) setGiftDone(true)
+    const order = list.map((s) => s.id)
+    const atOrPast = (sceneId) => {
+      const i = order.indexOf(sceneId)
+      return i >= 0 && index > i
+    }
+    if (atOrPast('stars') || index > 0) setOpeningReady(true)
+    if (atOrPast('heart')) setHeartReady(true)
+    if (atOrPast('cake')) setCakeDone(true)
+    if (atOrPast('gift') || id === 'letter') setGiftDone(true)
   }, [])
 
   const goTo = useCallback(
     (index) => {
       const next = clampScene(index)
-      const hash = hashForScene(next)
+      const hash = hashForScene(next, scenesRef.current)
       if (window.location.hash === hash) {
         resetGatesFor(next)
         setSceneIndex(next)
@@ -60,7 +70,7 @@ function StoryApp() {
       }
       window.location.hash = hash
     },
-    [resetGatesFor],
+    [clampScene, resetGatesFor],
   )
 
   const goNext = useCallback(() => {
@@ -72,21 +82,43 @@ function StoryApp() {
   }, [goTo])
 
   useEffect(() => {
-    ensureSceneHash(sceneIndexFromHash())
+    if (!ready) return
+    const initial = sceneIndexFromHash(window.location.hash, scenes)
+    ensureSceneHash(initial, scenes)
+    resetGatesFor(initial, scenes)
+    setSceneIndex(initial)
 
     const onHashChange = () => {
-      const next = sceneIndexFromHash()
+      const next = sceneIndexFromHash(window.location.hash, scenesRef.current)
       resetGatesFor(next)
       setSceneIndex(next)
     }
 
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
-  }, [resetGatesFor])
+  }, [ready, scenes, resetGatesFor])
 
   useEffect(() => {
     titleRef.current?.focus({ preventScroll: true })
   }, [sceneIndex])
+
+  /* Warm letter-scene assets during earlier scenes so the finale opens faster. */
+  useEffect(() => {
+    if (!ready) return undefined
+    const id = scenes[sceneIndex]?.id
+    const nearLetter = id === 'cake' || id === 'finale' || id === 'gift' || id === 'letter'
+    if (nearLetter) {
+      preloadLove003()
+      return undefined
+    }
+    const ric = window.requestIdleCallback
+    if (typeof ric === 'function') {
+      const handle = ric(() => preloadLove003(), { timeout: 4000 })
+      return () => window.cancelIdleCallback?.(handle)
+    }
+    const t = window.setTimeout(() => preloadLove003(), 1800)
+    return () => window.clearTimeout(t)
+  }, [ready, sceneIndex, scenes])
 
   const handleOpeningReady = useCallback(() => setOpeningReady(true), [])
   const handleHeartReady = useCallback(() => setHeartReady(true), [])
@@ -98,8 +130,10 @@ function StoryApp() {
   const handleCakeDone = useCallback(() => setCakeDone(true), [])
   const handleGiftPicked = useCallback(() => setGiftDone(true), [])
 
+  const sceneId = scenes[sceneIndex]?.id
+
   const handleCta = useCallback(() => {
-    if (sceneIndexRef.current === 1) {
+    if (scenesRef.current[sceneIndexRef.current]?.id === 'heart') {
       if (heartOpening) return
       setHeartOpening(true)
       return
@@ -108,10 +142,10 @@ function StoryApp() {
   }, [heartOpening, goNext])
 
   const ctaDisabled =
-    (sceneIndex === 0 && !openingReady) ||
-    (sceneIndex === 1 && (!heartReady || heartOpening)) ||
-    (sceneIndex === 3 && !cakeDone) ||
-    (sceneIndex === 5 && !giftDone)
+    (sceneId === 'stars' && !openingReady) ||
+    (sceneId === 'heart' && (!heartReady || heartOpening)) ||
+    (sceneId === 'cake' && !cakeDone) ||
+    (sceneId === 'gift' && !giftDone)
 
   useEffect(() => {
     ctaRef.current = { disabled: ctaDisabled, handleCta }
@@ -140,7 +174,7 @@ function StoryApp() {
         const tag = e.target instanceof Element ? e.target.tagName : ''
         if (tag === 'BUTTON' || tag === 'A') return
         if (ctaRef.current.disabled) return
-        if (sceneIndexRef.current >= SCENES.length - 1) return
+        if (sceneIndexRef.current >= scenesRef.current.length - 1) return
         e.preventDefault()
         ctaRef.current.handleCta()
       }
@@ -158,10 +192,10 @@ function StoryApp() {
     return <div className="fade-panel">{error}</div>
   }
 
-  const showCta = sceneIndex < SCENES.length - 1
-  const sceneKey = SCENES[sceneIndex]?.id ?? String(sceneIndex)
+  const showCta = sceneIndex < scenes.length - 1
+  const sceneKey = sceneId ?? String(sceneIndex)
   const ctaLabel = config.ctaLabels[sceneIndex] ?? '继续'
-  const sceneLabel = SCENES[sceneIndex]?.label ?? ''
+  const sceneLabel = scenes[sceneIndex]?.label ?? ''
 
   return (
     <div className="app">
@@ -172,25 +206,26 @@ function StoryApp() {
       <div className="scene-layer">
         <Suspense fallback={<StoryLoader />}>
           <StoryTransition sceneKey={sceneKey}>
-            {sceneIndex === 0 && <StarryOpening onReady={handleOpeningReady} />}
-            {sceneIndex === 1 && (
+            {sceneId === 'stars' && <StarryOpening onReady={handleOpeningReady} />}
+            {sceneId === 'heart' && (
               <HeartScene
                 onReady={handleHeartReady}
                 opening={heartOpening}
                 onOpened={handleHeartOpened}
               />
             )}
-            {sceneIndex === 2 && <AlbumScene />}
-            {sceneIndex === 3 && <CakeScene onExtinguished={handleCakeDone} />}
-            {sceneIndex === 4 && <FireworksScene />}
-            {sceneIndex === 5 && <GiftWheelScene onPicked={handleGiftPicked} />}
-            {sceneIndex === 6 && <Love003Finale />}
+            {sceneId === 'album' && <AlbumScene />}
+            {sceneId === 'cake' && <CakeScene onExtinguished={handleCakeDone} />}
+            {sceneId === 'finale' && <FireworksScene />}
+            {sceneId === 'gift' && <GiftWheelScene onPicked={handleGiftPicked} />}
+            {sceneId === 'letter' && <Love003Finale />}
           </StoryTransition>
         </Suspense>
       </div>
 
       <SceneChrome
         sceneIndex={sceneIndex}
+        scenes={scenes}
         showCta={showCta}
         ctaLabel={ctaLabel}
         onCta={handleCta}
