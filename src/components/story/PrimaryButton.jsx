@@ -11,7 +11,7 @@ export default function PrimaryButton({
 
   return (
     <button type={type} className={classes} onClick={onClick} disabled={disabled} {...rest}>
-      {children}
+      <span className="story-btn__label">{children}</span>
     </button>
   )
 }

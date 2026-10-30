@@ -1,81 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Float } from '@react-three/drei'
+import { useEffect, useRef, useState } from 'react'
 import { useBlowDetection } from '../../hooks/useBlowDetection'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import PrimaryButton from '../story/PrimaryButton'
 import StoryBackground from '../story/StoryBackground'
 import StoryCopy from '../story/StoryCopy'
 import './scenes.css'
-
-function Flame({ lit, position }) {
-  const ref = useRef(null)
-  useFrame((state) => {
-    if (!ref.current) return
-    if (!lit) {
-      ref.current.scale.setScalar(0.001)
-      return
-    }
-    const t = state.clock.elapsedTime
-    ref.current.scale.set(
-      0.85 + Math.sin(t * 18 + position[0]) * 0.15,
-      1 + Math.sin(t * 22 + position[2]) * 0.2,
-      0.85,
-    )
-  })
-
-  return (
-    <mesh ref={ref} position={position}>
-      <coneGeometry args={[0.06, 0.18, 8]} />
-      <meshStandardMaterial
-        color="#ffd27a"
-        emissive="#ff9f1c"
-        emissiveIntensity={lit ? 2.2 : 0}
-        transparent
-        opacity={lit ? 1 : 0}
-      />
-    </mesh>
-  )
-}
-
-function BirthdayCake({ lit }) {
-  const candles = useMemo(
-    () => [
-      [-0.35, 0.78, 0.1],
-      [0, 0.82, -0.15],
-      [0.35, 0.78, 0.1],
-    ],
-    [],
-  )
-
-  return (
-    <Float speed={1.1} floatIntensity={0.35} rotationIntensity={0.15}>
-      <group position={[0, -0.35, 0]}>
-        <mesh position={[0, 0.1, 0]} castShadow>
-          <cylinderGeometry args={[1.05, 1.12, 0.55, 48]} />
-          <meshStandardMaterial color="#ffc2dd" roughness={0.45} />
-        </mesh>
-        <mesh position={[0, 0.48, 0]} castShadow>
-          <cylinderGeometry args={[0.78, 0.86, 0.42, 48]} />
-          <meshStandardMaterial color="#fff5f9" roughness={0.35} />
-        </mesh>
-        <mesh position={[0, 0.72, 0]}>
-          <torusGeometry args={[0.72, 0.05, 12, 48]} />
-          <meshStandardMaterial color="#f472b6" />
-        </mesh>
-
-        {candles.map((pos, i) => (
-          <group key={i}>
-            <mesh position={[pos[0], 0.55, pos[2]]}>
-              <cylinderGeometry args={[0.035, 0.035, 0.35, 12]} />
-              <meshStandardMaterial color="#ffe4f1" />
-            </mesh>
-            <Flame lit={lit} position={[pos[0], pos[1], pos[2]]} />
-          </group>
-        ))}
-      </group>
-    </Float>
-  )
-}
 
 function statusCopy(status, lit) {
   if (!lit || status === 'done') return '愿望已收下，蜡烛熄灭啦！'
@@ -85,9 +14,59 @@ function statusCopy(status, lit) {
   return '点「用麦克风吹蜡烛」开启权限，或直接手动吹灭'
 }
 
+function Candle({ lit, reduced, delay = 0 }) {
+  return (
+    <span className={`cake-candle${lit ? '' : ' is-out'}`} style={{ '--flame-delay': `${delay}s` }}>
+      <span className="cake-candle__stick" />
+      <span className="cake-candle__flame" aria-hidden>
+        {!reduced ? <span className="cake-candle__glow" /> : null}
+        <span className="cake-candle__outer" />
+        <span className="cake-candle__inner" />
+      </span>
+      {!lit ? <span className="cake-candle__smoke" aria-hidden /> : null}
+    </span>
+  )
+}
+
+function IllustratedCake({ lit, reduced }) {
+  return (
+    <div className={`cake-illust${lit ? '' : ' is-out'}${reduced ? ' is-reduced' : ''}`}>
+      <div className="cake-illust__plate" />
+      <div className="cake-illust__tier cake-illust__tier--base">
+        <span className="cake-illust__frost" />
+        <span className="cake-illust__drip cake-illust__drip--l" />
+        <span className="cake-illust__drip cake-illust__drip--c" />
+        <span className="cake-illust__drip cake-illust__drip--r" />
+        <span className="cake-illust__berry cake-illust__berry--1" />
+        <span className="cake-illust__berry cake-illust__berry--2" />
+        <span className="cake-illust__berry cake-illust__berry--3" />
+      </div>
+      <div className="cake-illust__tier cake-illust__tier--top">
+        <span className="cake-illust__frost cake-illust__frost--top" />
+        <span className="cake-illust__bow" />
+      </div>
+      <div className="cake-illust__candles">
+        <Candle lit={lit} reduced={reduced} delay={0} />
+        <Candle lit={lit} reduced={reduced} delay={0.18} />
+        <Candle lit={lit} reduced={reduced} delay={0.08} />
+      </div>
+      {lit && !reduced ? (
+        <div className="cake-illust__sparkles" aria-hidden>
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 export default function CakeScene({ onExtinguished }) {
   const [lit, setLit] = useState(true)
   const blownRef = useRef(false)
+  const reduced = useReducedMotion()
   const { status, startListening, setOnBlow, setMeterEl } = useBlowDetection({
     enabled: lit,
     holdMs: 380,
@@ -109,27 +88,16 @@ export default function CakeScene({ onExtinguished }) {
     onExtinguished?.()
   }
 
-  // Denied: keep manual only — do not re-prompt getUserMedia.
   const showMicButton = lit && status === 'idle'
   const showMeter = lit && (status === 'listening' || status === 'blowing')
 
   return (
     <section className="scene cake-scene">
-      <StoryBackground variant="blush" />
+      <StoryBackground variant="blush" sparkles={lit && !reduced} />
       <StoryCopy title="许个愿吧" subtitle={statusCopy(status, lit)} />
 
-      <div className="r3f-stage cake-stage">
-        <Canvas camera={{ position: [0, 1.2, 3.4], fov: 42 }} dpr={[1, 1.75]}>
-          <color attach="background" args={['#ffc0cb']} />
-          <ambientLight intensity={0.85} />
-          <directionalLight position={[2, 4, 3]} intensity={1.15} color="#ffffff" />
-          <pointLight
-            position={[0, 1.5, 0.5]}
-            intensity={lit ? 1.4 : 0.35}
-            color="#ffb347"
-          />
-          <BirthdayCake lit={lit} />
-        </Canvas>
+      <div className="cake-stage" aria-hidden={!lit}>
+        <IllustratedCake lit={lit} reduced={reduced} />
       </div>
 
       <div className="cake-controls">

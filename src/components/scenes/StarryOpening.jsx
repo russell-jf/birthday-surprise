@@ -5,12 +5,12 @@ import { prefersReducedMotion } from '../../styles/motion'
 import StoryBackground from '../story/StoryBackground'
 import './scenes.css'
 
-/** Opening-only timing — keep total timeline under ~5s. */
+/** Opening-only timing — a bit leisurely so each line can land. */
 const OPEN = {
-  delay: 0.2,
-  fadeOut: 0.22,
-  fadeIn: 0.32,
-  hold: 0.48,
+  delay: 0.35,
+  fadeOut: 0.3,
+  fadeIn: 0.45,
+  hold: 0.9,
   yShift: 10,
 }
 

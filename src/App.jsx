@@ -12,6 +12,7 @@ import { ensureSceneHash, hashForScene, sceneIndexFromHash } from './utils/scene
 const HeartScene = lazy(() => import('./components/scenes/HeartScene'))
 const AlbumScene = lazy(() => import('./components/scenes/AlbumScene'))
 const CakeScene = lazy(() => import('./components/scenes/CakeScene'))
+const GiftWheelScene = lazy(() => import('./components/scenes/GiftWheelScene'))
 
 function clampScene(index) {
   return Math.max(0, Math.min(index, SCENES.length - 1))
@@ -26,6 +27,7 @@ function StoryApp() {
   const [heartReady, setHeartReady] = useState(false)
   const [heartOpening, setHeartOpening] = useState(false)
   const [cakeDone, setCakeDone] = useState(false)
+  const [giftDone, setGiftDone] = useState(false)
   const titleRef = useRef(null)
   const sceneIndexRef = useRef(sceneIndex)
   const ctaRef = useRef({ disabled: true, handleCta: () => {} })
@@ -40,9 +42,11 @@ function StoryApp() {
     setHeartReady(false)
     setHeartOpening(false)
     setCakeDone(false)
+    setGiftDone(false)
     if (index > 0) setOpeningReady(true)
     if (index > 1) setHeartReady(true)
     if (index > 3) setCakeDone(true)
+    if (index > 5) setGiftDone(true)
   }, [])
 
   const goTo = useCallback(
@@ -92,6 +96,7 @@ function StoryApp() {
     goNext()
   }, [goNext])
   const handleCakeDone = useCallback(() => setCakeDone(true), [])
+  const handleGiftPicked = useCallback(() => setGiftDone(true), [])
 
   const handleCta = useCallback(() => {
     if (sceneIndexRef.current === 1) {
@@ -105,7 +110,8 @@ function StoryApp() {
   const ctaDisabled =
     (sceneIndex === 0 && !openingReady) ||
     (sceneIndex === 1 && (!heartReady || heartOpening)) ||
-    (sceneIndex === 3 && !cakeDone)
+    (sceneIndex === 3 && !cakeDone) ||
+    (sceneIndex === 5 && !giftDone)
 
   useEffect(() => {
     ctaRef.current = { disabled: ctaDisabled, handleCta }
@@ -177,7 +183,8 @@ function StoryApp() {
             {sceneIndex === 2 && <AlbumScene />}
             {sceneIndex === 3 && <CakeScene onExtinguished={handleCakeDone} />}
             {sceneIndex === 4 && <FireworksScene />}
-            {sceneIndex === 5 && <Love003Finale />}
+            {sceneIndex === 5 && <GiftWheelScene onPicked={handleGiftPicked} />}
+            {sceneIndex === 6 && <Love003Finale />}
           </StoryTransition>
         </Suspense>
       </div>

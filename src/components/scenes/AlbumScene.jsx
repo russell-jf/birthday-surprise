@@ -6,6 +6,7 @@ import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls
 import { buildWallPhotos } from '../../data/content'
 import { useStoryConfig } from '../../context/StoryConfig'
 import { prefersReducedMotion } from '../../styles/motion'
+import LiquidGlassPanel from '../glass/LiquidGlassPanel'
 import PrimaryButton from '../story/PrimaryButton'
 import StoryBackground from '../story/StoryBackground'
 import StoryCopy from '../story/StoryCopy'
@@ -165,7 +166,7 @@ export default function AlbumScene() {
     }
     window.addEventListener('resize', onResize)
 
-    const cycle = reduced
+    let cycle = reduced
       ? null
       : window.setInterval(() => {
           setLayout((prev) => {
@@ -176,10 +177,16 @@ export default function AlbumScene() {
           })
         }, 9000)
 
-    apiRef.current = { transformTo }
+    const stopAutoCycle = () => {
+      if (!cycle) return
+      window.clearInterval(cycle)
+      cycle = null
+    }
+
+    apiRef.current = { transformTo, stopAutoCycle }
 
     return () => {
-      if (cycle) window.clearInterval(cycle)
+      stopAutoCycle()
       window.removeEventListener('resize', onResize)
       cancelAnimationFrame(frame)
       controls.dispose()
@@ -195,6 +202,7 @@ export default function AlbumScene() {
   }, [wallPhotos])
 
   const switchLayout = (id) => {
+    apiRef.current?.stopAutoCycle()
     setLayout(id)
     apiRef.current?.transformTo(id, prefersReducedMotion() ? 400 : 1500)
   }
@@ -220,13 +228,42 @@ export default function AlbumScene() {
       </div>
 
       {preview ? (
-        <div className="wall-preview" role="dialog" aria-label={preview.title}>
-          <button type="button" className="wall-preview-close" onClick={() => setPreview(null)}>
-            关闭
-          </button>
-          <img src={preview.src} alt={preview.title} />
-          <h3>{preview.title}</h3>
-          <p>{preview.caption}</p>
+        <div
+          className="wall-preview-backdrop"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setPreview(null)
+          }}
+        >
+          <LiquidGlassPanel
+            className="wall-preview"
+            fallbackClassName="wall-preview"
+            width="min(88vw, 22rem)"
+            padding="1.15rem 1rem 1.2rem"
+            style={{ top: '46%' }}
+          >
+            <div className="wall-preview-inner" role="dialog" aria-label={preview.title}>
+              <button
+                type="button"
+                className="wall-preview-close"
+                aria-label="关闭"
+                onClick={() => setPreview(null)}
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                  <path
+                    d="M6.4 6.4l11.2 11.2M17.6 6.4L6.4 17.6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+              <img src={preview.src} alt={preview.title} />
+              <h3>{preview.title}</h3>
+              <p>{preview.caption}</p>
+            </div>
+          </LiquidGlassPanel>
         </div>
       ) : null}
     </section>

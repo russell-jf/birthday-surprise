@@ -1,0 +1,26 @@
+/* Shared liquid-glass surfaces (panels + fallbacks) */
+
+.glass-panel-fallback {
+  width: min(92vw, 22rem);
+  padding: 1.25rem 1.15rem 1.2rem;
+  text-align: center;
+  border-radius: var(--card-radius);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.glass-panel-liquid {
+  text-align: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0;
+}
+
+.glass__warp {
+	backdrop-filter: unset !important;
+}

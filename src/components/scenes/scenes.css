@@ -11,6 +11,7 @@
 .album-wall-scene,
 .cake-scene,
 .finale-scene,
+.gift-scene,
 .love003-scene {
   background: linear-gradient(165deg, #ffe4ec 0%, var(--love-pink) 48%, var(--love-deep) 100%);
 }
@@ -59,29 +60,121 @@
   }
 }
 
-/* Heart / rose */
+/* Heart / rose — flat storybook illustration */
 .heart-scene {
   transform-origin: 50% 50%;
 }
 
-.heart-stage {
+.heart-stage-wrap {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 52%;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: min(68vw, 16.5rem);
+  transform: translate(-50%, -46%);
+  pointer-events: none;
+}
+
+.heart-stage {
+  width: 100%;
   will-change: transform, opacity;
 }
 
-.love002-frame {
-  position: absolute;
-  inset: 0;
+.rose-illust {
+  position: relative;
   width: 100%;
-  height: 100%;
-  border: 0;
-  background: transparent;
+  aspect-ratio: 240 / 280;
+  filter: drop-shadow(0 14px 28px rgba(190, 24, 93, 0.22));
+}
+
+.rose-illust__glow {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 72%;
+  height: 48%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 154, 200, 0.45), transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: roseGlow 3.4s ease-in-out infinite;
+}
+
+.rose-illust.is-reduced .rose-illust__glow {
+  animation: none;
+}
+
+.rose-illust__svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rose-illust__sparkles {
+  position: absolute;
+  inset: 6% 8% 42%;
+  z-index: 2;
   pointer-events: none;
+}
+
+.rose-illust__sparkles span {
+  position: absolute;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  animation: cakeSparkle 2.6s ease-in-out infinite;
+}
+
+.rose-illust__sparkles span:nth-child(1) {
+  left: 6%;
+  top: 48%;
+}
+
+.rose-illust__sparkles span:nth-child(2) {
+  left: 18%;
+  top: 16%;
+  animation-delay: 0.35s;
+}
+
+.rose-illust__sparkles span:nth-child(3) {
+  left: 48%;
+  top: 0;
+  animation-delay: 0.7s;
+}
+
+.rose-illust__sparkles span:nth-child(4) {
+  right: 16%;
+  top: 14%;
+  animation-delay: 1.05s;
+}
+
+.rose-illust__sparkles span:nth-child(5) {
+  right: 4%;
+  top: 46%;
+  animation-delay: 1.4s;
+}
+
+.rose-illust__sparkles span:nth-child(6) {
+  left: 58%;
+  top: 58%;
+  width: 0.22rem;
+  height: 0.22rem;
+  animation-delay: 1.8s;
+}
+
+@keyframes roseGlow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
 }
 
 .heart-scatter {
@@ -108,16 +201,10 @@
   will-change: transform, opacity;
 }
 
-@media (max-width: 640px) {
-  .heart-stage {
-    inset: var(--chrome-top) 0 var(--chrome-bottom);
-  }
-
-  .love002-frame {
-    inset: auto;
-    width: min(92vw, 78dvh);
-    height: min(92vw, 78dvh);
-    position: relative;
+@media (prefers-reduced-motion: reduce) {
+  .rose-illust__glow,
+  .rose-illust__sparkles span {
+    animation: none;
   }
 }
 
@@ -137,19 +224,39 @@
   width: 110px;
   height: 110px;
   padding: 0;
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--glass-border);
   border-radius: var(--card-radius-sm);
-  box-shadow: 0 0 14px rgba(190, 26, 37, 0.18);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   transition: box-shadow var(--dur-mid) var(--ease-soft), border-color var(--dur-mid) var(--ease-soft);
+}
+
+.wall-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 42%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 .wall-card:hover,
 .wall-card:focus-visible {
-  border-color: rgba(190, 26, 37, 0.55);
-  box-shadow: 0 0 22px rgba(190, 26, 37, 0.32);
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 0 22px rgba(190, 26, 37, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
   outline: none;
 }
 
@@ -165,6 +272,7 @@
   position: absolute;
   right: 6px;
   top: 4px;
+  z-index: 2;
   font-family: var(--font-ui);
   font-size: 0.68rem;
   font-weight: 500;
@@ -187,21 +295,34 @@
   pointer-events: auto;
 }
 
+.wall-preview-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.16), transparent 55%),
+    rgba(74, 18, 32, 0.12);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 .wall-preview {
+  z-index: 36;
+  color: var(--ink);
+  text-align: center;
+}
+
+.wall-preview.glass-panel-fallback {
   position: absolute;
   left: 50%;
   top: 46%;
   transform: translate(-50%, -50%);
-  z-index: 35;
   width: min(88vw, 22rem);
-  padding: 1.1rem 1rem 1.15rem;
-  border-radius: var(--card-radius);
-  background: var(--surface-strong);
-  border: 1px solid var(--border-soft);
-  box-shadow: var(--shadow);
-  color: var(--ink);
-  text-align: center;
-  backdrop-filter: blur(10px);
+}
+
+.wall-preview-inner {
+  position: relative;
+  padding-top: 0.35rem;
 }
 
 .wall-preview img {
@@ -231,15 +352,33 @@
 
 .wall-preview-close {
   position: absolute;
-  right: 0.7rem;
-  top: 0.55rem;
-  font-family: var(--font-ui);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  right: 0.35rem;
+  top: 0.2rem;
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  min-height: 2.15rem;
+  padding: 0;
+  border-radius: 999px;
   color: var(--ink-title);
-  opacity: 0.85;
-  min-height: 2rem;
-  padding: 0 0.35rem;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  opacity: 0.92;
+  transition:
+    background var(--dur-mid) var(--ease-soft),
+    opacity var(--dur-mid) var(--ease-soft);
+}
+
+.wall-preview-close:hover,
+.wall-preview-close:focus-visible {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.62);
+  outline: none;
+}
+
+.wall-preview-close svg {
+  display: block;
 }
 
 /* Love003 embed */
@@ -265,9 +404,358 @@
   }
 }
 
-/* Cake */
+/* Cake — flat storybook illustration (no 3D) */
 .cake-stage {
-  inset: 16% 0 22%;
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -42%);
+  z-index: 5;
+  width: min(72vw, 17.5rem);
+  pointer-events: none;
+}
+
+.cake-illust {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.08;
+  animation: cakeFloat 4.2s ease-in-out infinite;
+}
+
+.cake-illust.is-reduced {
+  animation: none;
+}
+
+.cake-illust__plate {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 4%;
+  height: 12%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, #fff9fc, #ffd6e8 70%, #ff9ac8);
+  box-shadow: 0 10px 24px rgba(190, 24, 93, 0.18);
+}
+
+.cake-illust__tier {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0.55rem 0.55rem 0.85rem 0.85rem;
+  box-shadow: 0 8px 20px rgba(190, 24, 93, 0.14);
+}
+
+.cake-illust__tier--base {
+  bottom: 12%;
+  width: 78%;
+  height: 28%;
+  background: linear-gradient(180deg, #ffc2dd 0%, #f9a8d4 55%, #f472b6 100%);
+}
+
+.cake-illust__tier--top {
+  bottom: 36%;
+  width: 54%;
+  height: 22%;
+  background: linear-gradient(180deg, #fff7fb 0%, #ffe4f1 60%, #ffc2dd 100%);
+}
+
+.cake-illust__frost {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 28%;
+  border-radius: 0.55rem 0.55rem 0 0;
+  background: linear-gradient(180deg, #fff9fc, #ffe4f1);
+}
+
+.cake-illust__frost--top {
+  background: linear-gradient(180deg, #ffffff, #fff7fb);
+}
+
+.cake-illust__drip {
+  position: absolute;
+  top: 18%;
+  width: 11%;
+  height: 42%;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(180deg, #fff9fc, #ffe4f1);
+}
+
+.cake-illust__drip--l {
+  left: 14%;
+}
+
+.cake-illust__drip--c {
+  left: 44%;
+  height: 52%;
+}
+
+.cake-illust__drip--r {
+  right: 16%;
+  left: auto;
+}
+
+.cake-illust__berry {
+  position: absolute;
+  bottom: 18%;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff9ac8, #db2777);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.cake-illust__berry--1 {
+  left: 22%;
+}
+
+.cake-illust__berry--2 {
+  left: 48%;
+  width: 0.62rem;
+  height: 0.62rem;
+}
+
+.cake-illust__berry--3 {
+  right: 24%;
+}
+
+.cake-illust__bow {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 1.15rem;
+  height: 0.85rem;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 40%, #ff9ac8, #ec4899);
+  border-radius: 50% 50% 45% 45%;
+  box-shadow:
+    -0.55rem 0.05rem 0 -0.08rem #f472b6,
+    0.55rem 0.05rem 0 -0.08rem #f472b6;
+}
+
+.cake-illust__bow::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 50%;
+  background: #e8b86d;
+  transform: translate(-50%, -50%);
+}
+
+.cake-illust__candles {
+  position: absolute;
+  left: 50%;
+  bottom: 54%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.15rem;
+  width: 48%;
+}
+
+.cake-candle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 0.55rem;
+}
+
+.cake-candle__stick {
+  width: 0.42rem;
+  height: 1.55rem;
+  border-radius: 0.18rem;
+  background: linear-gradient(90deg, #fff9fc, #ffe4f1 45%, #ffc2dd);
+  box-shadow: 0 2px 6px rgba(190, 24, 93, 0.12);
+}
+
+.cake-candle__flame {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 0.85rem;
+  height: 1.2rem;
+  transform: translateX(-50%);
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+.cake-candle__glow {
+  position: absolute;
+  left: 50%;
+  bottom: 0.1rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 211, 122, 0.55), transparent 68%);
+  transform: translateX(-50%);
+  animation: flameGlow 1.4s ease-in-out infinite;
+  animation-delay: var(--flame-delay, 0s);
+}
+
+.cake-candle__outer {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0.72rem;
+  height: 1rem;
+  border-radius: 50% 50% 45% 45%;
+  background: linear-gradient(180deg, #ffd27a 10%, #ff9f1c 85%);
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: flameFlicker 0.55s ease-in-out infinite alternate;
+  animation-delay: var(--flame-delay, 0s);
+  box-shadow: 0 0 12px rgba(255, 159, 28, 0.55);
+}
+
+.cake-candle__inner {
+  position: absolute;
+  left: 50%;
+  bottom: 0.12rem;
+  width: 0.32rem;
+  height: 0.55rem;
+  border-radius: 50% 50% 40% 40%;
+  background: linear-gradient(180deg, #fff9e6, #ffe082);
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: flameFlicker 0.4s ease-in-out infinite alternate-reverse;
+  animation-delay: var(--flame-delay, 0s);
+}
+
+.cake-candle.is-out .cake-candle__flame {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.2) translateY(0.4rem);
+}
+
+.cake-candle__smoke {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  transform: translateX(-50%);
+  animation: candleSmoke 1.4s var(--ease-out) forwards;
+  animation-delay: var(--flame-delay, 0s);
+}
+
+.cake-illust__sparkles {
+  position: absolute;
+  inset: 8% 12% 48%;
+  pointer-events: none;
+}
+
+.cake-illust__sparkles span {
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  animation: cakeSparkle 2.4s ease-in-out infinite;
+}
+
+.cake-illust__sparkles span:nth-child(1) {
+  left: 8%;
+  top: 55%;
+  animation-delay: 0s;
+}
+
+.cake-illust__sparkles span:nth-child(2) {
+  left: 22%;
+  top: 18%;
+  animation-delay: 0.4s;
+}
+
+.cake-illust__sparkles span:nth-child(3) {
+  left: 50%;
+  top: 0%;
+  animation-delay: 0.8s;
+}
+
+.cake-illust__sparkles span:nth-child(4) {
+  right: 22%;
+  top: 22%;
+  animation-delay: 1.1s;
+}
+
+.cake-illust__sparkles span:nth-child(5) {
+  right: 8%;
+  top: 58%;
+  animation-delay: 1.5s;
+}
+
+.cake-illust.is-out {
+  filter: saturate(0.92);
+}
+
+@keyframes cakeFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.45rem);
+  }
+}
+
+@keyframes flameFlicker {
+  from {
+    transform: translateX(-50%) scaleX(0.92) scaleY(1) rotate(-3deg);
+  }
+  to {
+    transform: translateX(-50%) scaleX(1.05) scaleY(1.08) rotate(4deg);
+  }
+}
+
+@keyframes flameGlow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(-50%) scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+  }
+}
+
+@keyframes candleSmoke {
+  0% {
+    opacity: 0.7;
+    transform: translateX(-50%) translateY(0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-30%) translateY(-2.2rem) scale(1.6);
+  }
+}
+
+@keyframes cakeSparkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cake-illust,
+  .cake-candle__outer,
+  .cake-candle__inner,
+  .cake-candle__glow,
+  .cake-illust__sparkles span {
+    animation: none;
+  }
 }
 
 .cake-controls {
@@ -285,9 +773,13 @@
 
 .mic-meter {
   width: 100%;
-  height: 0.4rem;
+  height: 0.55rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   overflow: hidden;
 }
 
@@ -374,11 +866,14 @@
   max-height: min(58dvh, 28rem);
   overflow: auto;
   padding: 1.35rem 1.4rem 1.6rem;
-  background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.42), transparent 48%),
+    var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--card-radius);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(8px);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .poem-line {
@@ -450,6 +945,320 @@
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff7fb, #ff9ac8);
   box-shadow: 0 0 12px rgba(255, 194, 221, 0.9);
+}
+
+/* Gift wheel — same blush storybook as the letter finale */
+.gift-copy {
+  top: clamp(9%, 10vh, 12%);
+}
+
+.gift-copy .story-title {
+  font-size: clamp(1.7rem, 5.2vw, 2.45rem);
+}
+
+.gift-stage {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 16px 36px rgba(190, 24, 93, 0.18));
+}
+
+.gift-stage > div {
+  line-height: 0;
+}
+
+.gift-toolbar {
+  position: absolute;
+  left: 50%;
+  top: calc(42% + min(36vw, 10.5rem, 22dvh) + 0.75rem);
+  transform: translateX(-50%);
+  z-index: 25;
+  width: min(88vw, 22rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: auto;
+}
+
+.gift-chances {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: var(--weight-ui);
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.gift-chances strong {
+  color: var(--ink-title);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.gift-bag-btn {
+  min-height: 2.45rem;
+  padding: 0 1.2rem;
+  font-size: 0.9rem;
+}
+
+.gift-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(255, 248, 252, 0.48);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: giftModalIn 0.28s var(--ease-out);
+}
+
+.gift-modal {
+  position: relative;
+  z-index: 51;
+  width: min(88vw, 22rem);
+  padding: 1.15rem 1rem 1.05rem;
+  border-radius: 1.65rem;
+  color: var(--ink);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 24px 56px rgba(74, 18, 32, 0.08),
+    0 2px 0 rgba(255, 255, 255, 0.9) inset;
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.gift-modal-close {
+  position: absolute;
+  right: 0.55rem;
+  top: 0.5rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  min-height: 1.65rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), transparent 42%), var(--glass-tint-deep);
+  box-shadow: 0 2px 10px rgba(74, 18, 32, 0.05);
+  opacity: 0.85;
+  cursor: pointer;
+  transition:
+    background var(--dur-mid) var(--ease-soft),
+    opacity var(--dur-mid) var(--ease-soft);
+}
+
+.gift-modal-close:hover,
+.gift-modal-close:focus-visible {
+  opacity: 1;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.28), transparent 42%), var(--glass-tint-deep);;
+  outline: none;
+}
+
+.gift-modal-close svg {
+  display: block;
+}
+
+.gift-modal-card {
+  position: relative;
+  border-radius: 1.15rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 10px 28px rgba(74, 18, 32, 0.06),
+    0 1px 0 rgba(255, 255, 255, 1) inset;
+}
+
+.gift-modal-card--hero {
+  padding: 1.15rem 1rem 1.05rem;
+}
+
+.gift-modal-card--detail {
+  padding: 1rem 0.95rem 1.05rem;
+}
+
+.gift-modal--bag {
+  text-align: left;
+}
+
+.gift-modal--bag .gift-modal-kicker,
+.gift-modal--bag .gift-modal-title {
+  text-align: left;
+  padding-right: 1.6rem;
+}
+
+.gift-modal--bag .gift-modal-card--hero {
+  padding: 1rem 1rem 0.9rem;
+}
+
+.gift-modal--bag .gift-modal-card--detail {
+  padding: 0.75rem;
+}
+
+.gift-modal--bag .gift-modal-hint {
+  text-align: left;
+  padding: 0.35rem 0.25rem;
+}
+
+.gift-modal-kicker {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  font-weight: var(--weight-ui);
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.gift-modal-thumb {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0.85rem auto 0.35rem;
+  object-fit: contain;
+  display: block;
+}
+
+.gift-modal-title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-body);
+  font-size: clamp(1.35rem, 4.2vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-title);
+  text-align: center;
+}
+
+.gift-modal-hint {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  text-align: center;
+  line-height: var(--leading-body);
+}
+
+.gift-modal-meta {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-ui);
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.gift-modal-actions {
+  margin-top: 0.95rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.gift-bag-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: min(42dvh, 16rem);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gift-bag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 247, 251, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 14px rgba(74, 18, 32, 0.04);
+}
+
+.gift-bag-thumb {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.gift-bag-thumb--empty {
+  display: block;
+  border-radius: 50%;
+  background: var(--rose-100);
+}
+
+.gift-bag-copy {
+  min-width: 0;
+}
+
+.gift-bag-label {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ink-title);
+  letter-spacing: 0.03em;
+}
+
+.gift-bag-index {
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.gift-bag-hint {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+@keyframes giftModalIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .gift-stage {
+    top: 40%;
+  }
+
+  .gift-toolbar {
+    top: calc(40% + min(38vw, 10rem, 20dvh) + 0.55rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gift-modal-backdrop {
+    animation: none;
+  }
 }
 
 /* Fireworks */

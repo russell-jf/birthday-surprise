@@ -7,6 +7,7 @@ export const DEFAULT_SCENES = [
   { id: 'album', label: '相册' },
   { id: 'cake', label: '蛋糕' },
   { id: 'finale', label: '烟花' },
+  { id: 'gift', label: '礼物' },
   { id: 'letter', label: '情书' },
 ]
 
@@ -15,8 +16,77 @@ export const DEFAULT_CTA_LABELS = [
   '开启我们的故事',
   '去吹蜡烛',
   '倒数烟花',
+  '去抽礼物',
   '打开情书',
 ]
+
+const giftAsset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
+
+/**
+ * weight：相对权重，越大越容易中。概率 = 该项 weight / 全部 weight 之和。
+ * 例：weight 10 与 30 → 约 25% / 75%。不写则默认 1（均等）。
+ */
+export const DEFAULT_GIFTS = [
+  {
+    id: 'redpacket',
+    label: '520红包',
+    hint: '一笔刚好的心意，数字也藏着喜欢。',
+    image: giftAsset('gift/redpacket.svg'),
+    weight: 20,
+  },
+  {
+    id: 'dior',
+    label: '迪奥口红',
+    hint: '希望你的每一次微笑，都更加甜美。',
+    image: giftAsset('gift/lipstick.svg'),
+    weight: 15,
+  },
+  {
+    id: 'tencent',
+    label: '腾讯年卡',
+    hint: '腾讯视频 VIP 年卡，想看就看。',
+    image: giftAsset('gift/vip.svg'),
+    weight: 20,
+  },
+  {
+    id: 'gold',
+    label: '2g黄金',
+    hint: '沉甸甸的一点点，留给长久的我们。',
+    image: giftAsset('gift/gold.svg'),
+    weight: 20,
+  },
+  {
+    id: 'dji',
+    label: '大疆Pocket',
+    hint: '随手一拍都是电影感，把你的日常都记下来。',
+    image: giftAsset('gift/dji.svg'),
+    weight: 30,
+  },
+  {
+    id: 'disney',
+    label: '迪士尼卷',
+    hint: '下一场童话冒险，我想和你一起去。',
+    image: giftAsset('gift/disney.svg'),
+    weight: 5,
+  },
+  {
+    id: 'milk-tea',
+    label: '奶茶券',
+    hint: '一个月的奶茶自由，我都买单。',
+    image: giftAsset('gift/milktea.svg'),
+    weight: 30,
+  },
+  {
+    id: 'flower',
+    label: '永生花',
+    hint: '不用换水的小花束，把今天留住。',
+    image: giftAsset('gift/flower.svg'),
+    weight: 25,
+  },
+ 
+]
+
+export const GIFT_WHEEL_RIM = giftAsset('gift/wheel-rim.svg')
 
 export const DEFAULT_OPENING_LINES = [
   `嗨，${DEFAULT_NICKNAME}…`,

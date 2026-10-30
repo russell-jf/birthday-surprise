@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="rimGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="70%" stop-color="#ff7aa8"/>
+      <stop offset="100%" stop-color="#f0487c"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#rimGlow)" fill-rule="evenodd" d="M200 2a198 198 0 1 1 0 396a198 198 0 1 1 0-396zM200 34a166 166 0 1 0 0 332a166 166 0 1 0 0-332z"/>
+  <g>
+  <circle cx="200.0" cy="18.0" r="7" fill="#ffffff"/>
+  <circle cx="247.1" cy="24.2" r="7" fill="#9ef0d2"/>
+  <circle cx="291.0" cy="42.4" r="7" fill="#ffffff"/>
+  <circle cx="328.7" cy="71.3" r="7" fill="#9ef0d2"/>
+  <circle cx="357.6" cy="109.0" r="7" fill="#ffffff"/>
+  <circle cx="375.8" cy="152.9" r="7" fill="#9ef0d2"/>
+  <circle cx="382.0" cy="200.0" r="7" fill="#ffffff"/>
+  <circle cx="375.8" cy="247.1" r="7" fill="#9ef0d2"/>
+  <circle cx="357.6" cy="291.0" r="7" fill="#ffffff"/>
+  <circle cx="328.7" cy="328.7" r="7" fill="#9ef0d2"/>
+  <circle cx="291.0" cy="357.6" r="7" fill="#ffffff"/>
+  <circle cx="247.1" cy="375.8" r="7" fill="#9ef0d2"/>
+  <circle cx="200.0" cy="382.0" r="7" fill="#ffffff"/>
+  <circle cx="152.9" cy="375.8" r="7" fill="#9ef0d2"/>
+  <circle cx="109.0" cy="357.6" r="7" fill="#ffffff"/>
+  <circle cx="71.3" cy="328.7" r="7" fill="#9ef0d2"/>
+  <circle cx="42.4" cy="291.0" r="7" fill="#ffffff"/>
+  <circle cx="24.2" cy="247.1" r="7" fill="#9ef0d2"/>
+  <circle cx="18.0" cy="200.0" r="7" fill="#ffffff"/>
+  <circle cx="24.2" cy="152.9" r="7" fill="#9ef0d2"/>
+  <circle cx="42.4" cy="109.0" r="7" fill="#ffffff"/>
+  <circle cx="71.3" cy="71.3" r="7" fill="#9ef0d2"/>
+  <circle cx="109.0" cy="42.4" r="7" fill="#ffffff"/>
+  <circle cx="152.9" cy="24.2" r="7" fill="#9ef0d2"/>
+  </g>
+</svg>

@@ -1,6 +1,8 @@
 import {
   DEFAULT_BIRTH_DATE,
   DEFAULT_CTA_LABELS,
+  DEFAULT_GIFTS,
+  GIFT_WHEEL_RIM,
   DEFAULT_LETTER_LINES,
   DEFAULT_MEMORIES,
   DEFAULT_NICKNAME,
@@ -9,7 +11,7 @@ import {
   DEFAULT_TOGETHER,
 } from './defaults'
 
-/** @typedef {{ nickname: string, birthDate: string, openingLines: string[], ctaLabels: string[], letterLines: string[], together: { year: number, month: number, day: number }, memories: { src: string, title: string, caption: string }[] }} StoryConfig */
+/** @typedef {{ nickname: string, birthDate: string, openingLines: string[], ctaLabels: string[], letterLines: string[], together: { year: number, month: number, day: number }, memories: { src: string, title: string, caption: string }[], gifts: { id: string, label: string, hint: string, image?: string, weight?: number }[] }} StoryConfig */
 
 /** @type {StoryConfig} */
 let runtimeConfig = {
@@ -20,6 +22,7 @@ let runtimeConfig = {
   letterLines: [...DEFAULT_LETTER_LINES],
   together: { ...DEFAULT_TOGETHER },
   memories: DEFAULT_MEMORIES.map((m) => ({ ...m })),
+  gifts: DEFAULT_GIFTS.map((g) => ({ ...g })),
 }
 
 export const SCENES = DEFAULT_SCENES
@@ -33,7 +36,7 @@ export function setConfig(next) {
     nickname: next.nickname || DEFAULT_NICKNAME,
     birthDate: next.birthDate || DEFAULT_BIRTH_DATE,
     openingLines: next.openingLines?.length ? [...next.openingLines] : [...DEFAULT_OPENING_LINES],
-    ctaLabels: next.ctaLabels?.length === 5 ? [...next.ctaLabels] : [...DEFAULT_CTA_LABELS],
+    ctaLabels: next.ctaLabels?.length === 6 ? [...next.ctaLabels] : [...DEFAULT_CTA_LABELS],
     letterLines: next.letterLines?.length ? [...next.letterLines] : [...DEFAULT_LETTER_LINES],
     together: next.together
       ? {
@@ -47,9 +50,18 @@ export function setConfig(next) {
       title: m.title,
       caption: m.caption,
     })),
+    gifts: (next.gifts?.length ? next.gifts : DEFAULT_GIFTS).map((g, i) => ({
+      id: g.id,
+      label: g.label,
+      hint: g.hint,
+      image: g.image || DEFAULT_GIFTS[i % DEFAULT_GIFTS.length].image,
+      weight: Number(g.weight) > 0 ? Number(g.weight) : DEFAULT_GIFTS[i % DEFAULT_GIFTS.length].weight || 1,
+    })),
   }
   return runtimeConfig
 }
+
+export { GIFT_WHEEL_RIM }
 
 export const NICKNAME = DEFAULT_NICKNAME
 export const BIRTH_DATE = DEFAULT_BIRTH_DATE
