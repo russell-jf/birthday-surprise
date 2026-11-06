@@ -93,7 +93,7 @@ export default function CakeScene({ onExtinguished }) {
 
   return (
     <section className="scene cake-scene">
-      <StoryBackground variant="blush" sparkles={lit && !reduced} />
+      <StoryBackground scene="cake" sparkles={lit && !reduced} />
       <StoryCopy title="许个愿吧" subtitle={statusCopy(status, lit)} />
 
       <div className="cake-stage" aria-hidden={!lit}>

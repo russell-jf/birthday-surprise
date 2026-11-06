@@ -1,17 +1,24 @@
 /* Based on Awesome-Love-Code Web/003 (MIT) — adapted for fullscreen embed */
-/* Fonts aligned with the React storybook: display / body / ui */
+/* Fonts aligned with the React storybook: LemiCookie only */
 /* Text layer is document-flow (readable on mobile); only the tree canvas is scaled. */
 
+@font-face {
+	font-family: 'LemiCookie';
+	src: url('/fonts/乐米曲奇方块体.ttf') format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
 :root {
-	/* Prefer system CJK fonts inside the iframe (no Google Fonts round-trip). */
-	--font-display: 'Songti SC', 'Times New Roman', serif;
-	--font-body: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-	--font-ui: 'PingFang SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
-	--font-main: var(--font-body);
+	--font-display: 'LemiCookie', sans-serif;
+	--font-body: 'LemiCookie', sans-serif;
+	--font-ui: 'LemiCookie', sans-serif;
+	--font-main: 'LemiCookie', sans-serif;
 	--ink: #4a1220;
 	--ink-strong: #b3122b;
 	--ink-title: #9d174d;
-	--love-pink: #ffc0cb;
+	--love-pink: #f2d6d4;
 	--letter-pad-x: max(20px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
 }
 

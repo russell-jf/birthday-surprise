@@ -75,6 +75,7 @@ export default function AlbumScene() {
   const apiRef = useRef(null)
   const [layout, setLayout] = useState('table')
   const [preview, setPreview] = useState(null)
+
   const wallPhotos = useMemo(() => buildWallPhotos(config.memories), [config.memories])
 
   useEffect(() => {
@@ -82,8 +83,8 @@ export default function AlbumScene() {
     if (!mount) return undefined
 
     const reduced = prefersReducedMotion()
-    const width = mount.clientWidth
-    const height = mount.clientHeight
+    const width = mount.clientWidth || 1
+    const height = mount.clientHeight || 1
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(42, width / height, 1, 10000)
@@ -93,6 +94,7 @@ export default function AlbumScene() {
     renderer.setSize(width, height)
     renderer.domElement.style.position = 'absolute'
     renderer.domElement.style.inset = '0'
+    renderer.domElement.style.touchAction = 'none'
     mount.appendChild(renderer.domElement)
 
     const controls = new TrackballControls(camera, renderer.domElement)
@@ -103,13 +105,25 @@ export default function AlbumScene() {
 
     const objects = []
     const targets = buildTargets(wallPhotos.length)
+    let morphTl = null
+    let frame = 0
+    const spin = !reduced
+    const spinSpeed = 0.004
+
+    const tick = () => {
+      frame = requestAnimationFrame(tick)
+      if (spin) scene.rotation.y += spinSpeed
+      controls.update()
+      renderer.render(scene, camera)
+    }
 
     wallPhotos.forEach((photo, i) => {
       const el = document.createElement('button')
       el.type = 'button'
       el.className = 'wall-card'
-      el.style.backgroundColor = `rgba(190, 26, 37, ${0.12 + Math.random() * 0.22})`
-      el.innerHTML = `<img src="${photo.src}" alt="${photo.title}" draggable="false" /><span>${i + 1}</span>`
+      el.setAttribute('aria-label', photo.title)
+      el.style.backgroundColor = `rgba(190, 26, 37, ${0.12 + (i % 5) * 0.04})`
+      el.innerHTML = `<img src="${photo.src}" alt="" draggable="false" decoding="async" loading="${i < 6 ? 'eager' : 'lazy'}" />`
       el.addEventListener('click', (e) => {
         e.stopPropagation()
         setPreview(photo)
@@ -117,65 +131,69 @@ export default function AlbumScene() {
 
       const object = new CSS3DObject(el)
       object.position.set(
-        Math.random() * 2800 - 1400,
-        Math.random() * 2800 - 1400,
-        Math.random() * 2800 - 1400,
+        ((i * 97) % 900) - 450,
+        ((i * 61) % 700) - 350,
+        ((i * 43) % 500) - 250,
       )
       scene.add(object)
       objects.push(object)
     })
 
-    const transformTo = (key, duration = 1600) => {
+    const transformTo = (key, duration = 1400) => {
       const list = targets[key]
-      const dur = reduced ? 0.35 : (duration + Math.random() * duration) / 1000
+      if (!list) return
+      morphTl?.kill()
+      const base = reduced ? 0.28 : duration / 1000
+      morphTl = gsap.timeline()
       objects.forEach((object, i) => {
         const target = list[i]
-        gsap.to(object.position, {
-          x: target.position.x,
-          y: target.position.y,
-          z: target.position.z,
-          duration: dur,
-          ease: 'expo.inOut',
-        })
-        gsap.to(object.rotation, {
-          x: target.rotation.x,
-          y: target.rotation.y,
-          z: target.rotation.z,
-          duration: dur,
-          ease: 'expo.inOut',
-        })
+        if (!target) return
+        const stagger = reduced ? 0 : Math.min(i * 0.012, 0.18)
+        morphTl.to(
+          object.position,
+          {
+            x: target.position.x,
+            y: target.position.y,
+            z: target.position.z,
+            duration: base,
+            ease: 'power3.inOut',
+          },
+          stagger,
+        )
+        morphTl.to(
+          object.rotation,
+          {
+            x: target.rotation.x,
+            y: target.rotation.y,
+            z: target.rotation.z,
+            duration: base,
+            ease: 'power3.inOut',
+          },
+          stagger,
+        )
       })
     }
 
-    let frame = 0
-    const tick = () => {
-      frame = requestAnimationFrame(tick)
-      if (!reduced) scene.rotation.y += 0.004
-      controls.update()
-      renderer.render(scene, camera)
-    }
-    tick()
-    transformTo('table', reduced ? 400 : 1800)
-
     const onResize = () => {
-      const w = mount.clientWidth
-      const h = mount.clientHeight
+      const w = mount.clientWidth || 1
+      const h = mount.clientHeight || 1
       camera.aspect = w / h
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
     window.addEventListener('resize', onResize)
 
-    let cycle = reduced
-      ? null
-      : window.setInterval(() => {
-          setLayout((prev) => {
-            const idx = LAYOUTS.findIndex((l) => l.id === prev)
-            const next = LAYOUTS[(idx + 1) % LAYOUTS.length].id
-            transformTo(next, 1400)
-            return next
-          })
-        }, 9000)
+    let cycle = null
+    if (!reduced) {
+      cycle = window.setInterval(() => {
+        setLayout((prev) => {
+          const idx = LAYOUTS.findIndex((l) => l.id === prev)
+          const next = LAYOUTS[(idx + 1) % LAYOUTS.length].id
+          transformTo(next, 1400)
+          return next
+        })
+      }, 9000)
+    }
 
     const stopAutoCycle = () => {
       if (!cycle) return
@@ -183,13 +201,27 @@ export default function AlbumScene() {
       cycle = null
     }
 
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(frame)
+        frame = 0
+        return
+      }
+      if (!frame) tick()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
     apiRef.current = { transformTo, stopAutoCycle }
+    transformTo('table', reduced ? 400 : 1800)
+    tick()
 
     return () => {
       stopAutoCycle()
-      window.removeEventListener('resize', onResize)
       cancelAnimationFrame(frame)
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('resize', onResize)
       controls.dispose()
+      morphTl?.kill()
       gsap.killTweensOf(objects.map((o) => o.position))
       gsap.killTweensOf(objects.map((o) => o.rotation))
       objects.forEach((obj) => {
@@ -209,10 +241,10 @@ export default function AlbumScene() {
 
   return (
     <section className="scene album-scene album-wall-scene">
-      <StoryBackground variant="soft" />
+      <StoryBackground scene="album" />
       <StoryCopy title="回忆照片墙" className="wall-copy" />
 
-      <div ref={mountRef} className="wall-stage" />
+      <div ref={mountRef} className="wall-stage" aria-label="可拖拽旋转的照片墙" />
 
       <div className="wall-menu">
         {LAYOUTS.map((item) => (
@@ -259,7 +291,7 @@ export default function AlbumScene() {
                   />
                 </svg>
               </button>
-              <img src={preview.src} alt={preview.title} />
+              <img src={preview.src} alt={preview.title} decoding="async" />
               <h3>{preview.title}</h3>
               <p>{preview.caption}</p>
             </div>

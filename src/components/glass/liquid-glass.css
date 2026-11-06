@@ -1,15 +1,13 @@
-/* Shared liquid-glass surfaces (panels + fallbacks) */
+/* Paper window surfaces (gift-site language) */
 
 .glass-panel-fallback {
   width: min(92vw, 22rem);
   padding: 1.25rem 1.15rem 1.2rem;
   text-align: center;
-  border-radius: var(--card-radius);
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-paper);
+  background: var(--paper);
+  border: var(--window-border-w) solid var(--ink);
+  box-shadow: var(--window-shadow);
 }
 
 .glass-panel-liquid {
@@ -22,5 +20,5 @@
 }
 
 .glass__warp {
-	backdrop-filter: unset !important;
+  backdrop-filter: unset !important;
 }

@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useStoryConfig } from '../../context/StoryConfig'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { MOTION, prefersReducedMotion } from '../../styles/motion'
 import StoryBackground from '../story/StoryBackground'
-import StoryCopy from '../story/StoryCopy'
 import './scenes.css'
 
 const COUNT_FROM = 3
-const COLORS = ['#be1a25', '#ff6b8a', '#ffc0cb', '#ffffff', '#fbbf24', '#ff8fab', '#f472b6']
+const SWIPE_THRESHOLD = 42
+const COLORS = ['#aa587a', '#c96f85', '#efb8c8', '#fffaf0', '#ffe9a3', '#8b80b8', '#e1a9be']
 
 /** Parametric heart for easter-egg bursts (normalized -1..1 → screen). */
 function heartPoint(t, size) {
@@ -110,10 +110,26 @@ export default function FireworksScene() {
   const { config } = useStoryConfig()
   const [count, setCount] = useState(COUNT_FROM)
   const [celebrating, setCelebrating] = useState(false)
+  const [photoIndex, setPhotoIndex] = useState(0)
   const layerRef = useRef(null)
   const titleRef = useRef(null)
   const tapCountRef = useRef(0)
+  const swipeRef = useRef({ active: false, x: 0, y: 0, moved: false })
   const reducedMotion = useReducedMotion()
+
+  const photos = useMemo(() => {
+    const list = (config.memories || []).filter((m) => m?.src)
+    if (!list.length) return []
+    const preferred = list.findIndex((m) => m.title === '今天也爱你')
+    if (preferred <= 0) return list
+    return [list[preferred], ...list.slice(0, preferred), ...list.slice(preferred + 1)]
+  }, [config.memories])
+
+  const finalePhoto = photos[photoIndex] || photos[0]
+
+  useEffect(() => {
+    setPhotoIndex(0)
+  }, [photos])
 
   useEffect(() => {
     if (count < 0) return undefined
@@ -160,11 +176,62 @@ export default function FireworksScene() {
     }
   }, [celebrating])
 
+  const stepPhoto = useCallback(
+    (dir) => {
+      if (photos.length < 2) return
+      setPhotoIndex((i) => (i + dir + photos.length) % photos.length)
+    },
+    [photos.length],
+  )
+
+  const onPhotoPointerDown = useCallback((e) => {
+    e.stopPropagation()
+    const point = 'clientX' in e ? e : e.changedTouches?.[0]
+    if (!point) return
+    if (typeof e.currentTarget?.setPointerCapture === 'function' && e.pointerId != null) {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId)
+      } catch {
+        /* ignore capture failures on unsupported targets */
+      }
+    }
+    swipeRef.current = { active: true, x: point.clientX, y: point.clientY, moved: false }
+  }, [])
+
+  const onPhotoPointerMove = useCallback((e) => {
+    if (!swipeRef.current.active) return
+    const point = 'clientX' in e ? e : e.changedTouches?.[0]
+    if (!point) return
+    const dx = point.clientX - swipeRef.current.x
+    const dy = point.clientY - swipeRef.current.y
+    if (Math.abs(dx) > 10 || Math.abs(dy) > 10) swipeRef.current.moved = true
+  }, [])
+
+  const onPhotoPointerUp = useCallback(
+    (e) => {
+      if (!swipeRef.current.active) return
+      const point = 'clientX' in e ? e : e.changedTouches?.[0]
+      const start = swipeRef.current
+      swipeRef.current = { active: false, x: 0, y: 0, moved: false }
+      if (!point) return
+      const dx = point.clientX - start.x
+      const dy = point.clientY - start.y
+      if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return
+      e.stopPropagation()
+      stepPhoto(dx < 0 ? 1 : -1)
+    },
+    [stepPhoto],
+  )
+
   const handlePointer = useCallback(
     (e) => {
       if (!celebrating || !layerRef.current) return
-      /* Ignore chrome buttons */
-      if (e.target instanceof Element && e.target.closest('button, a')) return
+      if (
+        e.target instanceof Element &&
+        e.target.closest('button, a, .finale-polaroid, .finale-card-head, .finale-card-msg')
+      ) {
+        return
+      }
 
       const layer = layerRef.current
       const reduced = prefersReducedMotion()
@@ -194,7 +261,7 @@ export default function FireworksScene() {
       className={`scene finale-scene${celebrating ? ' is-live' : ''}`}
       onPointerDown={handlePointer}
     >
-      <StoryBackground variant="deep" sparkles={!reducedMotion} />
+      <StoryBackground scene="finale" sparkles={!reducedMotion} />
       <div className="finale-glow" aria-hidden />
       <div ref={layerRef} className="fw-layer" aria-hidden />
 
@@ -206,13 +273,52 @@ export default function FireworksScene() {
           <p>准备烟花…</p>
         </div>
       ) : (
-        <StoryCopy className="finale-copy" titleAs="h1">
-          <h1 ref={titleRef} className="story-title">
-            生日快乐，{config.nickname}！
-          </h1>
-          <p className="story-body">愿你被爱包围，像今晚的烟花一样闪亮。</p>
-          <p className="finale-tap-hint">轻触屏幕，为你绽放</p>
-        </StoryCopy>
+        <div className="finale-card" ref={titleRef}>
+          <div className="finale-card-blob finale-card-blob--tl" aria-hidden />
+          <div className="finale-card-blob finale-card-blob--br" aria-hidden />
+          <span className="finale-card-spark finale-card-spark--a" aria-hidden />
+          <span className="finale-card-spark finale-card-spark--b" aria-hidden />
+          <span className="finale-card-spark finale-card-spark--c" aria-hidden />
+
+          <header className="finale-card-head">
+            <p className="finale-card-happy">HAPPY</p>
+            <h1 className="finale-card-birthday">Birthday</h1>
+          </header>
+
+          {finalePhoto?.src ? (
+            <div
+              className="finale-polaroid"
+              role="img"
+              aria-label={`${finalePhoto.title || '回忆照片'}，左右滑动可切换`}
+              onPointerDown={onPhotoPointerDown}
+              onPointerMove={onPhotoPointerMove}
+              onPointerUp={onPhotoPointerUp}
+              onPointerCancel={onPhotoPointerUp}
+            >
+              <div className="finale-polaroid-frame">
+                <div className="finale-polaroid-shot">
+                  <img
+                    key={finalePhoto.src + photoIndex}
+                    className="finale-polaroid-img"
+                    src={finalePhoto.src}
+                    alt={finalePhoto.title || ''}
+                    decoding="async"
+                    draggable="false"
+                  />
+                  <span className="finale-polaroid-grain" aria-hidden />
+                  <span className="finale-polaroid-vignette" aria-hidden />
+                </div>
+                <p className="finale-polaroid-caption">宝宝 ♡</p>
+              </div>
+            </div>
+          ) : null}
+
+          <p className="finale-card-msg">
+            愿你被爱包围，像今晚的烟花一样闪亮。
+            <br />
+            生日快乐，我的{config.nickname}。
+          </p>
+        </div>
       )}
     </section>
   )

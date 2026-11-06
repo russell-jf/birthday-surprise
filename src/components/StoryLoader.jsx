@@ -20,9 +20,9 @@ export default function StoryLoader({ done = false, className = '', label = '加
         <svg viewBox="0 0 32 29" className="story-loader__svg" focusable="false">
           <defs>
             <linearGradient id={gradId} x1="6" y1="2" x2="26" y2="28" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#ff8fb3" />
-              <stop offset="45%" stopColor="#ec4899" />
-              <stop offset="100%" stopColor="#be185d" />
+              <stop offset="0%" stopColor="#efb8c8" />
+              <stop offset="45%" stopColor="#e1a9be" />
+              <stop offset="100%" stopColor="#aa587a" />
             </linearGradient>
           </defs>
           <path

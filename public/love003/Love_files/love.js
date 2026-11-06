@@ -172,7 +172,7 @@
             ctx.lineTo(x1, y1);
             ctx.lineTo(x2, y1);
             ctx.stroke();
-            ctx.font = "600 14px 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif";
+            ctx.font = "600 14px 'LemiCookie', sans-serif";
             ctx.textAlign = 'left';
             ctx.textBaseline = 'bottom';
             ctx.fillText("点这里", x1 + 4, y1 - 4);

@@ -12,7 +12,8 @@ import {
 } from './defaults'
 
 /** @typedef {{ id: string, label: string, hint: string, image?: string, weight?: number }} GiftConfig */
-/** @typedef {{ nickname: string, birthDate: string, openingLines: string[], ctaLabels: string[], letterLines: string[], together: { year: number, month: number, day: number }, memories: { src: string, title: string, caption: string }[], giftEnabled: boolean, gifts: GiftConfig[] }} StoryConfig */
+/** @typedef {{ fromName: string, toName: string, year: number, month: number, day: number, hour?: number, minute?: number, second?: number }} TogetherConfig */
+/** @typedef {{ nickname: string, birthDate: string, openingLines: string[], ctaLabels: string[], letterLines: string[], together: TogetherConfig, memories: { src: string, title: string, caption: string }[], giftEnabled: boolean, gifts: GiftConfig[] }} StoryConfig */
 
 const giftAsset = (path) => `${import.meta.env.BASE_URL}${String(path || '').replace(/^\//, '')}`
 
@@ -33,6 +34,37 @@ function padCtaLabels(labels, giftEnabled) {
     return [...labels.slice(0, 4), DEFAULT_CTA_LABELS[4], labels[4]]
   }
   return giftEnabled ? [...DEFAULT_CTA_LABELS] : DEFAULT_CTA_LABELS.filter((_, i) => i !== 4)
+}
+
+function clampInt(value, fallback, min, max) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return fallback
+  const i = Math.trunc(n)
+  if (min != null && i < min) return fallback
+  if (max != null && i > max) return fallback
+  return i
+}
+
+/** @param {Partial<TogetherConfig> | null | undefined} raw */
+function normalizeTogether(raw) {
+  const base = DEFAULT_TOGETHER
+  if (!raw || typeof raw !== 'object') return { ...base }
+  return {
+    fromName: String(raw.fromName || base.fromName).trim() || base.fromName,
+    toName: String(raw.toName || base.toName).trim() || base.toName,
+    year: clampInt(raw.year, base.year, 1970, 2100),
+    month: clampInt(raw.month, base.month, 1, 12),
+    day: clampInt(raw.day, base.day, 1, 31),
+    hour: clampInt(raw.hour ?? 0, 0, 0, 23),
+    minute: clampInt(raw.minute ?? 0, 0, 0, 59),
+    second: clampInt(raw.second ?? 0, 0, 0, 59),
+  }
+}
+
+/** Build a Date from together config (month is 1–12). */
+export function togetherStartDate(together = getConfig().together) {
+  const t = normalizeTogether(together)
+  return new Date(t.year, t.month - 1, t.day, t.hour || 0, t.minute || 0, t.second || 0, 0)
 }
 
 /** @type {StoryConfig} */
@@ -84,13 +116,7 @@ export function setConfig(next) {
     openingLines: next?.openingLines?.length ? [...next.openingLines] : [...DEFAULT_OPENING_LINES],
     ctaLabels: padCtaLabels(next?.ctaLabels, giftEnabled),
     letterLines: next?.letterLines?.length ? [...next.letterLines] : [...DEFAULT_LETTER_LINES],
-    together: next?.together
-      ? {
-          year: next.together.year,
-          month: next.together.month,
-          day: next.together.day,
-        }
-      : { ...DEFAULT_TOGETHER },
+    together: normalizeTogether(next?.together),
     memories: (next?.memories?.length ? next.memories : DEFAULT_MEMORIES).map((m) => ({
       src: m.src,
       title: m.title,
@@ -117,9 +143,14 @@ export const MEMORIES = DEFAULT_MEMORIES
 
 export const WALL_PHOTO_COUNT = 40
 
-export function buildWallPhotos(memories = getConfig().memories) {
+export function buildWallPhotos(memories = getConfig().memories, options = {}) {
   const list = memories.length ? memories : DEFAULT_MEMORIES
-  return Array.from({ length: WALL_PHOTO_COUNT }, (_, i) => {
+  const requested = Number(options.count)
+  const count = Number.isFinite(requested) && requested > 0
+    ? Math.floor(requested)
+    : WALL_PHOTO_COUNT
+
+  return Array.from({ length: count }, (_, i) => {
     const base = list[i % list.length]
     return {
       ...base,

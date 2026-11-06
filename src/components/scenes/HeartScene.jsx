@@ -242,13 +242,14 @@ export default function HeartScene({ onReady, opening = false, onOpened }) {
 
   return (
     <section ref={rootRef} className="scene heart-scene">
-      <StoryBackground variant="blush" stars starCount={36} sparkles={!reducedMotion} />
+      <StoryBackground scene="heart" stars starCount={36} sparkles={!reducedMotion} />
       <StoryCopy title="一朵只给你的玫瑰" subtitle="轻轻晃一晃，再点下方开启我们的故事。" />
 
       <div className="heart-stage-wrap">
         <div ref={stageRef} className="heart-stage">
           <IllustratedRose reduced={reducedMotion} />
         </div>
+
       </div>
 
       <div className="heart-scatter" aria-hidden>

@@ -101,12 +101,6 @@ export const DEFAULT_LETTER_LINES = [
   '在这个特别又美好的日子里',
   '想把世间所有的温柔都送给你',
   '感谢你的出现，点亮了我所有的时光',
-  '真心真意想对你说一声',
-  '',
-  '愿你新的一岁阳光万里，鲜花沿路开放',
-  '愿所有的美好与幸运都与你相拥',
-  '愿你眼里总有光芒，笑里全是坦荡',
-  '愿你被时光温柔以待，永远无忧无虑',
   '',
   '每一年的这一天，我都想陪你一起度过',
   '无论岁月如何变幻，初心始终不变',
@@ -117,7 +111,14 @@ export const DEFAULT_LETTER_LINES = [
   '-- 永远爱你的我',
 ]
 
-export const DEFAULT_TOGETHER = { year: 2023, month: 7, day: 20 }
+/** together.month is 1–12 (January = 1). Optional hour/minute/second default to 0. */
+export const DEFAULT_TOGETHER = {
+  fromName: 'SJF',
+  toName: 'LYM',
+  year: 2023,
+  month: 8,
+  day: 20,
+}
 
 const asset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`
 

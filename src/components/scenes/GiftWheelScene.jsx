@@ -11,8 +11,8 @@ import './scenes.css'
 const MAX_CHANCES = 3
 const STORAGE_KEY = 'birthday-surprise:gift-wins'
 
-/* Match lucky-canvas demo: soft cream / mint wedges */
-const PRIZE_BG = ['#fff3c4', '#c8f4ef', '#fff3c4', '#c8f4ef', '#fff3c4', '#c8f4ef', '#fff3c4', '#c8f4ef']
+/* Peach letter wedges — cream / mint from gift-site palette */
+const PRIZE_BG = ['#fff0a6', '#d8eee2', '#fff0a6', '#d8eee2', '#fff0a6', '#d8eee2', '#fff0a6', '#d8eee2']
 
 function wheelSize() {
   if (typeof window === 'undefined') return 300
@@ -74,6 +74,9 @@ export default function GiftWheelScene({ onPicked }) {
   const [winModal, setWinModal] = useState(null)
   const [bagOpen, setBagOpen] = useState(false)
   const [size, setSize] = useState(wheelSize)
+  const [fontsReady, setFontsReady] = useState(
+    () => typeof document !== 'undefined' && document.fonts?.check?.('500 15px LemiCookie'),
+  )
 
   const chancesLeft = Math.max(0, MAX_CHANCES - wins.length)
   const wonIds = useMemo(() => new Set(wins.map((w) => w.id)), [wins])
@@ -93,6 +96,28 @@ export default function GiftWheelScene({ onPicked }) {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    const ready = async () => {
+      try {
+        if (document.fonts?.load) {
+          await Promise.all([
+            document.fonts.load('500 15px LemiCookie'),
+            document.fonts.load('500 17px LemiCookie'),
+          ])
+          await document.fonts.ready
+        }
+      } catch {
+        /* ignore */
+      }
+      if (!cancelled) setFontsReady(true)
+    }
+    ready()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
     if (!winModal && !bagOpen) return undefined
     const onKey = (e) => {
       if (e.key !== 'Escape') return
@@ -107,7 +132,7 @@ export default function GiftWheelScene({ onPicked }) {
     () => [
       {
         padding: '16px',
-        background: '#ff6b9d',
+        background: '#e8a8bc',
         imgs: [
           {
             src: GIFT_WHEEL_RIM,
@@ -127,17 +152,18 @@ export default function GiftWheelScene({ onPicked }) {
         const emptied = wonIds.has(gift.id)
         const imgSize = size < 280 ? '28%' : '30%'
         return {
-          background: emptied ? '#e5dde1' : PRIZE_BG[i % PRIZE_BG.length],
+          background: emptied ? '#e7dfd5' : PRIZE_BG[i % PRIZE_BG.length],
           fonts: [
             {
               text: emptied ? '抽空了' : gift.label,
               top: emptied ? '38%' : '10%',
-              fontColor: emptied ? '#9a8a90' : '#9d174d',
-              fontSize: size < 280 ? '12px' : '13px',
-              fontWeight: '600',
-              lineHeight: '16px',
+              fontColor: emptied ? '#70677e' : '#4b3f62',
+              fontSize: size < 280 ? '13px' : '15px',
+              fontWeight: '500',
+              fontStyle: 'LemiCookie',
+              lineHeight: '18px',
               wordWrap: true,
-              lengthLimit: '70%',
+              lengthLimit: '72%',
             },
           ],
           imgs:
@@ -166,19 +192,20 @@ export default function GiftWheelScene({ onPicked }) {
 
   const buttons = useMemo(
     () => [
-      { radius: '48%', background: '#ff6b9d' },
-      { radius: '42%', background: '#ffffff' },
+      { radius: '48%', background: '#f0b6c8' },
+      { radius: '42%', background: '#fff7f4' },
       {
         radius: '36%',
-        background: chancesLeft <= 0 ? '#c9a0ad' : '#ff5f93',
+        background: chancesLeft <= 0 ? '#e5c4ce' : '#ef9bb4',
         pointer: true,
         fonts: [
           {
             text: spinLabel,
             top: '-12px',
-            fontColor: '#ffffff',
-            fontSize: size < 280 ? '14px' : '16px',
-            fontWeight: '700',
+            fontColor: chancesLeft <= 0 ? '#8a6574' : '#fff8fb',
+            fontSize: size < 280 ? '15px' : '17px',
+            fontWeight: '500',
+            fontStyle: 'LemiCookie',
           },
         ],
       },
@@ -199,9 +226,10 @@ export default function GiftWheelScene({ onPicked }) {
 
   const defaultStyle = useMemo(
     () => ({
-      fontColor: '#9d174d',
-      fontSize: '13px',
-      fontWeight: '600',
+      fontColor: '#4b3f62',
+      fontSize: '15px',
+      fontWeight: '500',
+      fontStyle: 'LemiCookie',
     }),
     [],
   )
@@ -248,7 +276,7 @@ export default function GiftWheelScene({ onPicked }) {
   if (!gifts.length) {
     return (
       <section className="scene gift-scene">
-        <StoryBackground variant="blush" sparkles={!reducedMotion} />
+        <StoryBackground scene="gift" sparkles={!reducedMotion} />
         <StoryCopy title="礼物转盘" subtitle="还没有准备好礼物清单。" />
       </section>
     )
@@ -256,26 +284,29 @@ export default function GiftWheelScene({ onPicked }) {
 
   return (
     <section className="scene gift-scene">
-      <StoryBackground variant="blush" sparkles={!reducedMotion} />
+      <StoryBackground scene="gift" sparkles={!reducedMotion} />
 
       <StoryCopy className="gift-copy" titleAs="h1">
         <h1 className="story-title">挑选一份礼物</h1>
       </StoryCopy>
 
       <div className="gift-stage" style={{ width: size, height: size }}>
-        <LuckyWheel
-          key={`wheel-${[...wonIds].sort().join('|') || '0'}`}
-          ref={luckyRef}
-          width={`${size}px`}
-          height={`${size}px`}
-          blocks={blocks}
-          prizes={prizes}
-          buttons={buttons}
-          defaultConfig={defaultConfig}
-          defaultStyle={defaultStyle}
-          onStart={handleStart}
-          onEnd={handleEnd}
-        />
+        <span className="gift-stage-glow" aria-hidden />
+        {fontsReady ? (
+          <LuckyWheel
+            key={`wheel-${[...wonIds].sort().join('|') || '0'}-font`}
+            ref={luckyRef}
+            width={`${size}px`}
+            height={`${size}px`}
+            blocks={blocks}
+            prizes={prizes}
+            buttons={buttons}
+            defaultConfig={defaultConfig}
+            defaultStyle={defaultStyle}
+            onStart={handleStart}
+            onEnd={handleEnd}
+          />
+        ) : null}
       </div>
 
       <div className="gift-toolbar">

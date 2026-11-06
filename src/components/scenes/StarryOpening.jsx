@@ -100,7 +100,7 @@ export default function StarryOpening({ onReady }) {
 
   return (
     <section ref={rootRef} className="scene stars-scene" onClick={revealAll}>
-      <StoryBackground variant="blush" stars sparkles moon />
+      <StoryBackground scene="stars" stars sparkles moon />
       <div className="story-copy scene-copy stars-copy">
         <p ref={lineRef} className="type-line type-line--stack">
           …
